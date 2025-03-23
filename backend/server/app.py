@@ -106,5 +106,5 @@ def home():
 #     else:
 #         return jsonify(auth_response), 400
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run()
