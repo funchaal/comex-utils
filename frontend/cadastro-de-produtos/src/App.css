@@ -1,0 +1,175 @@
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+.App {
+  display: flex;
+  flex-direction: row;
+  /* align-items: center;
+  justify-content: center; */
+  height: 100%;
+}
+
+.main {
+  width: 1000px;
+  max-width: 100%;
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+  padding-top: 30px;
+  padding-left: 4vw;
+}
+
+.link {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.link .title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.link .description {
+  font-size: 0.8rem;
+  text-align: left;
+  font-weight: normal;
+}
+
+nav button {
+  margin: 0 5px;
+}
+
+.drop-file {
+  height: 200px;
+  background-color: rgba(40,42,54,255);
+  border: 2px dashed rgba(255, 255, 255, 0.87);
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* width: 350px; */
+}
+
+.upload-button {
+  background-color: rgba(40,42,54,255);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.87);
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.table-container {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 15px;
+  border: 1px solid rgba(88,114,164,0.4);
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-container th, .table-container td {
+  /* border: 1px solid rgba(88,114,164,0.4); */
+  padding: 10px;
+  text-align: left;
+}
+
+.table-container td {
+  border-left: 1px solid rgba(88,114,164,0.4);
+}
+
+.table-container th {
+  border-bottom: 3px solid rgba(22,157,224,255);
+}
+
+.orientation {
+  margin-top: 50px;
+}
+
+header {
+  width: 100%;
+  height: 60px;
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  /* background-color: blue; */
+  /* border-bottom: 1px solid rgba(88,114,164,0.4); */
+}
+
+.certificate-container {
+  margin-right: 20px;
+  position: relative;
+}
+
+.certificate-box {
+  right: 0;
+  position: absolute;
+  visibility: hidden;
+  width: 300px;
+  opacity: 0;
+  transition-duration: 500ms;
+  background-color: rgba(40,42,54,255);
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 10px;
+  border: 1px solid rgba(22,157,224,0.2);
+}
+
+.certificate-box.active {
+  visibility: visible;
+  opacity: 1;
+}
+
+.menu-container {
+  height: 100%;
+  position: relative;
+  width: 300px;
+  background-color: rgba(40,42,54,255);
+  padding-top: 30px;
+}
+
+.menu-container nav {
+  width: 300px;
+  height: 100%;
+}
+
+.menu-container nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  margin: 0 10px;
+}
+
+.menu-container nav ul li {
+  padding: 10px 0;
+  background-color: rgba(40,42,54,255);
+  border-radius: 8px;
+}
+
+.menu-container nav ul li .link {
+  color: white;
+  text-decoration: none;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px 20px;
+  font-size: 0.9rem;
+}
+
+.menu-container nav ul li:hover {
+  filter: brightness(1.5);
+}
