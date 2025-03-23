@@ -15,6 +15,10 @@ CORS(app)
 cert_path = './1007383757.pfx'
 cert_psw = 'jlmarine2025'
 
+@app.route('/', methods=['GET'])
+def home():
+    return 'Hi Vercel!'
+
 @app.route('/get-products', methods=['POST'])
 def getProducts():
     set_token, csrf_token = None, None
