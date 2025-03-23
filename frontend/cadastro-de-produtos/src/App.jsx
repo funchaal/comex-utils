@@ -28,8 +28,8 @@ function App() {
       <Menu />
       <div className='main'>
         <Routes>
-          {/* <Route path="/" element={<Home />} /> */}
-          <Route path="/gerar-planilha" element={<GerarPlanilha />} index/>
+          <Route path="/" element={<Home />} />
+          <Route path="/gerar-planilha" element={<GerarPlanilha />}/>
         </Routes>
       </div>
     </CustomProvider>
