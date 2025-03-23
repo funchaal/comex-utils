@@ -1,0 +1,13 @@
+flask
+flask_cors
+pandas
+contextlib
+pathlib
+tempfile
+requests
+cryptography
+json
+zipfile
+io
+openpyxl
+re
