@@ -17,7 +17,7 @@ import Menu from './components/Menu'
 function App() {
 
   useEffect(() => {
-    document.title = 'Catálogo de Produtos'
+    document.title = 'Comex Utils'
   }, [])
 
   return (
