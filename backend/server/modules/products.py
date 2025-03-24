@@ -129,7 +129,7 @@ def makeFillSheet(products, relation_json):
                         
                         cond_column_name = cond_column_name + options
 
-                    cond_column_name = cond_column_name + f'\n\n(atributo condicional, preencha apenas se {attr_cond['descricaoCondicao']})'
+                    cond_column_name = cond_column_name + '\n\n(atributo condicional, preencha apenas se ' + attr_cond['descricaoCondicao'] + ')'
                     cond_field_type = 2
                     cond_value = None
 
