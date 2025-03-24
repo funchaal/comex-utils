@@ -18,7 +18,7 @@ function GerarPlanilha() {
             const formData = new FormData();
             formData.append('file', data);
             
-            const response = await fetch('http://localhost:5000/make-sheet', {
+            const response = await fetch('https://comex-utils.onrender.com/make-sheet', {
                 method: 'POST', 
                 headers: {
                     'set-token': setToken, 
