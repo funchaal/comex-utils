@@ -19,46 +19,46 @@ CORS(app)
 def home():
     return 'Hi Vercel!'
 
-@app.route('/get-products', methods=['POST'])
-def getProducts():
-    set_token, csrf_token = None, None
-    print('requisição recebida')
-    raiz = request.args.get('root')
+# @app.route('/get-products', methods=['POST'])
+# def getProducts():
+#     set_token, csrf_token = None, None
+#     print('requisição recebida')
+#     raiz = request.args.get('root')
 
-    if not set_token:
-            set_token, csrf_token = autorizate(cert_path, cert_psw, prod=True).values()
+#     if not set_token:
+#             set_token, csrf_token = autorizate(cert_path, cert_psw, prod=True).values()
         
-    root_url = 'https://portalunico.siscomex.gov.br'
-    get_products_url = f'{root_url}/catp/api/ext/produto'
+#     root_url = 'https://portalunico.siscomex.gov.br'
+#     get_products_url = f'{root_url}/catp/api/ext/produto'
 
     # Cabeçalhos da requisição
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": set_token, 
-        "X-CSRF-Token": csrf_token
-    }
-    products = []
+    # headers = {
+    #     "Content-Type": "application/json",
+    #     "Authorization": set_token, 
+    #     "X-CSRF-Token": csrf_token
+    # }
+    # products = []
 
-    filters = {
-        'cpfCnpjRaiz': raiz
-    }
+    # filters = {
+    #     'cpfCnpjRaiz': raiz
+    # }
 
-    try:
-        # Enviando o POST request
-        response = requests.get(get_products_url, headers=headers, params=filters)
+    # try:
+    #     # Enviando o POST request
+    #     response = requests.get(get_products_url, headers=headers, params=filters)
 
-        # Verificando o status da resposta
-        if response.status_code == 200:
-            print("Requisição enviada com sucesso!")
-            products = response.json()
+    #     # Verificando o status da resposta
+    #     if response.status_code == 200:
+    #         print("Requisição enviada com sucesso!")
+    #         products = response.json()
 
-        else:
-            print(f"Erro ao enviar requisição: {response.status_code}")
-            print("Detalhes:", response.text)
+    #     else:
+    #         print(f"Erro ao enviar requisição: {response.status_code}")
+    #         print("Detalhes:", response.text)
 
-    except requests.exceptions.RequestException as e:
-        print(f"Erro na conexão: {e}")
-    return jsonify(products)
+    # except requests.exceptions.RequestException as e:
+    #     print(f"Erro na conexão: {e}")
+    # return jsonify(products)
 
 @app.route('/make-sheet', methods=['POST'])
 def makeSheet():
@@ -77,7 +77,7 @@ def makeSheet():
     
     set_token, csrf_token = request.headers['set-token'], request.headers['csrf-token']
 
-    print(set_token, csrf_token)
+    # print(set_token, csrf_token)
     
     relation_json = get_relation_json(prod=True, set_token=set_token, csrf_token=csrf_token)
     print(df.head())
