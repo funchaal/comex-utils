@@ -3,6 +3,10 @@ import { useState, useRef, useEffect, useContext } from 'react'
 
 import { Uploader, Input, Button } from 'rsuite'
 
+const prod = true;
+
+const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000';
+
 function Header() {
   
     const [certificateShow, setCertificateShow] = useState(false)
@@ -34,7 +38,7 @@ function Header() {
           const formData = new FormData();
           formData.append('file', data);
           
-          const response = await fetch('http://127.0.0.1:5000/authenticate-certificate', {
+          const response = await fetch(HOST + '/authenticate-certificate', {
               method: 'POST', 
               headers: { password: certificatePassword }, 
               body: formData
