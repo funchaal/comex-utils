@@ -10,9 +10,11 @@ import 'rsuite/dist/rsuite.min.css';
 
 import Home from './pages/Home';
 import GerarPlanilha from './pages/gerarPlanilha';
+import ConsultProducts from './pages/consultProducts';
 
 import Header from './components/Header'
 import Menu from './components/Menu'
+import PostProducts from './pages/postProducts';
 
 function App() {
 
@@ -23,13 +25,15 @@ function App() {
   return (
     <div className='App'>
     <AuthProvider>
-    <CustomProvider theme='dark'>
+    <CustomProvider theme='light'>
       <Header />
-      <Menu />
+      {/* <Menu /> */}
       <div className='main'>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/gerar-planilha" element={<GerarPlanilha />}/>
+          <Route path="/cadastrar-produtos" element={<PostProducts />}/>
+          <Route path="/consultar-produtos" element={<ConsultProducts />}/>
         </Routes>
       </div>
     </CustomProvider>

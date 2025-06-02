@@ -1,60 +1,127 @@
-#root {
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+* {
+  font-family: 'Mulish', sans-serif;
+}
+
+#root, html, body, .main, .App {
+  margin: 0;
   width: 100%;
   height: 100%;
 }
 
-.App {
-  display: flex;
-  flex-direction: row;
-  /* align-items: center;
-  justify-content: center; */
-  height: 100%;
-}
-
-.main {
-  width: 1000px;
-  max-width: 100%;
-  margin: 0;
-  padding: 1rem;
-  text-align: center;
-  padding-top: 30px;
-  padding-left: 4vw;
-}
-
-.link {
-  width: 150px;
-  height: 150px;
+#home {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
+  width: 100%;
+  height: 100%;
+}
+
+#home h1 {
+  font-size: 3rem;
+}
+
+#home nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 50px;
+}
+
+#home nav button {
+  width: 150px;
+  height: 150px;
+  background-color: rgb(252, 252, 252);
+  border: 2px solid rgba(84, 111, 245, 0.4);
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.link {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  align-items: center;
+  padding: 10px;
+  color: rgb(76, 76, 76); 
 }
 
 .link .title {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
+  text-align: center;
 }
 
-.link .description {
-  font-size: 0.8rem;
-  text-align: left;
-  font-weight: normal;
-}
+
 
 nav button {
   margin: 0 5px;
 }
 
-.drop-file {
-  height: 200px;
-  background-color: rgba(40,42,54,255);
-  border: 2px dashed rgba(255, 255, 255, 0.87);
-  border-radius: 12px;
+#gerar-planilha {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* width: 350px; */
+  width: 100%;
+  height: fit-content;
+  padding: 0 2%;
+  padding-top: 50px;
+}
+
+#root h1 {
+  font-size: 2.4em;
+  /* line-height: 1.5; */
+  font-weight: 800;
+}
+
+#root h2 {
+  font-size: 1.3em;
+  line-height: 1;
+  font-weight: normal;
+}
+
+#root h3 {
+  font-weight: bold;
+  font-size: 1.4em;
+}
+
+.drop-file-container {
+  height: fit-content;
+  width: 100%;
+  margin-top: 50px;
+}
+
+.drop-file {
+  height: 200px;
+  width: 100%;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 12px;
+  /* background-color: rgb(255, 255, 255) !important; */
+  background-color: rgb(249, 249, 249) !important;
+  border: 1px dashed #0d0d0d3b !important;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10vh;
+}
+
+.central-container {
+  width: 900px;
+  max-width: 100%;
 }
 
 .upload-button {
@@ -64,35 +131,7 @@ nav button {
   border-radius: 12px;
   padding: 0.5rem 1rem;
   cursor: pointer;
-}
-
-.table-container {
-  border-radius: 12px;
-  overflow: hidden;
-  margin-top: 15px;
-  border: 1px solid rgba(88,114,164,0.4);
-}
-
-.table-container table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.table-container th, .table-container td {
-  /* border: 1px solid rgba(88,114,164,0.4); */
-  padding: 10px;
-  text-align: left;
-}
-
-.table-container td {
-  border-left: 1px solid rgba(88,114,164,0.4);
-}
-
-.table-container th {
-  border-bottom: 3px solid rgba(22,157,224,255);
-}
-
-.orientation {
-  margin-top: 50px;
+  align-self: flex-end;
 }
 
 header {
@@ -172,4 +211,110 @@ header {
 
 .menu-container nav ul li:hover {
   filter: brightness(1.5);
+}
+
+.response-container {
+  width: 100%;
+  min-height: 100px;
+  max-height: 400px;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 12px;
+  overflow-y: auto;
+  background-color: rgb(249, 249, 249);
+  border: 1px solid #0d0d0d3b;
+  margin-bottom: 3vh;
+}
+.response-container p {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: rgba(81, 81, 81, 0.8);
+}
+
+.response-container.ok {
+  border-color: rgba(47, 232, 5, 0.864);
+}
+
+.response-container.ok p {
+  color: rgba(47, 232, 5, 0.864);
+}
+
+.response-container.error {
+  border-color: rgba(232, 50, 5, 0.864);
+}
+
+.response-container.error p {
+  color: rgba(232, 50, 5, 0.864);
+}
+
+.response-container::-webkit-scrollbar {
+  width: 8px;
+}
+.response-container::-webkit-scrollbar-thumb {
+  background-color: rgba(88,114,164,0.4);
+  border-radius: 10px;
+}
+.response-container::-webkit-scrollbar-track {
+  /* background-color: rgba(88,114,164,0.1); */
+  margin: 10px 0;
+}
+.response-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(88,114,164,0.6);
+}
+
+.response {
+  width: 100%;
+  white-space: pre-wrap;
+  padding: 10px;
+  border-radius: 8px;
+  column-count: 2;
+  column-gap: 20px;
+}
+
+.input-wrapper {
+  position: relative;
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.7rem 0.75rem 0.5rem 0.75rem; /* espaço extra para a label */
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-wrapper:hover .input {
+  border-color: #93c5fd;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.input-label {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.7rem;
+  background: #fff;
+  padding: 0 0.25rem;
+  color: #6b7280; /* gray-500 */
+  font-size: 1rem;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+/* Quando o input está focado ou preenchido */
+.input-wrapper.focused .input-label {
+  top: -0.5rem;
+  left: 0.5rem;
+  font-size: 0.75rem;
+  color: #3b82f6; /* azul principal */
 }

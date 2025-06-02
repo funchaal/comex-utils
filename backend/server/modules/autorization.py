@@ -39,15 +39,16 @@ def autorizate(cert_path='', psw='', prod=False):
 
     try:
         with pfx_to_pem(cert_path, psw) as cert:
-            response = requests.post(auth_url, cert=cert, headers=auth_headers)
-
             print("Autenticando...\n")
+
+            response = requests.post(auth_url, cert=cert, headers=auth_headers)
 
             set_token = response.headers['set-token']
             csrf_token = response.headers['x-csrf-token']
+            exp = response.headers['x-csrf-expiration']
 
             print('Autenticado!\n')
 
-            return { 'set-token': set_token, 'csrf-token': csrf_token, 'status': 'ok' }
+            return { 'set-token': set_token, 'csrf-token': csrf_token, 'exp': exp, 'status': response.status_code }
     except Exception as e:
-        return { 'status': 'error', 'message': f'{e}' }
+        return { 'status': response.status_code, 'message': f'{e}' }

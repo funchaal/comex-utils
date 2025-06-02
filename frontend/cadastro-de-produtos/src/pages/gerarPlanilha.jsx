@@ -1,14 +1,35 @@
-import React, { useRef, useState, useContext } from 'react';
-
-import { AuthProvider, AuthContext } from '../AuthContext';
+import React, { useState, useEffect } from 'react';
 
 import { Button, Uploader } from 'rsuite';
+
+const prod = false;
+const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000'
+
 
 function GerarPlanilha() {
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([]);
 
-    const { setToken, setSetToken, csrfToken, setCsrfToken } = useContext(AuthContext)
+    const [responseTitle, setResponseTitle] = useState('Nenhuma resposta por enquanto.');
+        const [responseColor, setResponseColor] = useState('neutral');
+        const [results, setResults] = useState({
+            response: [], 
+            status: null, 
+            text: ''
+        });
+    
+        useEffect(() => {
+            if (results.status) {
+                if (results.status === 200) {
+                    setResponseColor('ok')
+                } else {
+                    setResponseColor('error')
+                }
+            } else {
+                setResponseColor('neutral');
+            }
+        }, [results]);
+    
 
     async function handleUpload() {
         try {
@@ -17,19 +38,28 @@ function GerarPlanilha() {
             const data = fileList[0].blobFile;
             const formData = new FormData();
             formData.append('file', data);
+
+            const url = HOST + '/make-sheet'
             
-            const response = await fetch('https://comex-utils.onrender.com/make-sheet', {
+            const response = await fetch(url, {
                 method: 'POST', 
-                headers: {
-                    'set-token': setToken, 
-                    'csrf-token': csrfToken
-                }, 
                 body: formData
             });
 
             const file = await response.blob();
 
             handleDownload(file);
+
+            if (response.status === 200) {
+                setResponseTitle('Planilha gerada com sucesso!');
+            } else {
+                setResponseTitle('Erro ao gerar a planilha.');
+            }
+            setResults({
+                response: [],
+                status: response.status,
+                text: ''
+            });
 
         } catch (error) {
             console.error('Erro ao fazer upload do arquivo:', error);
@@ -63,66 +93,50 @@ function GerarPlanilha() {
     }
 
     return(
-        <div>
-            <h1>Gerar planilha</h1>
-            <h2>Gerar planilha para preenchimento dos atributos.</h2>
-            <br />
-            <div>
-            <Uploader 
-                action="http://127.0.0.1:5000/make-sheet" 
-                draggable 
-                autoUpload={false} 
-                multiple={false}
-                onChange={(fileList) => { setFileList(fileList) }}
-            >
-                <div className="drop-file" style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span>Click or Drag files to this area to upload</span>
+        <div id='gerar-planilha'>
+                    <div className="central-container">
+        
+                    <div className='input-container'>
+                        <h1>Gerar planilha</h1>
+                        <h2>Gerar planilha para preenchimento dos atributos.</h2>
+                        <div className="drop-file-container">
+                            <Uploader
+                                action=""
+                                draggable
+                                autoUpload={false}
+                                multiple={false}
+                                onChange={(fileList) => setFileList(fileList)}
+                                >
+                                <div className='drop-file'>
+                                    <p>Click or Drag files to this area to upload</p>
+                                </div>
+                            </Uploader>
+                    </div>
+        
+                        <br />
+        
+                        <Button
+                            size='lg'
+                            color='pink'
+                            appearance="primary"
+                            style={{ float: 'right' }}
+                            onClick={() => { handleUpload() }}
+                            className='upload-button'
+                            loading={loading}
+                            >
+                            Gerar
+                        </Button>
+                    </div>
+        
+                    <br />
+                    <div className={`response-container ${responseColor}`}>
+                        <p>{ responseTitle }</p>
+                        <pre className='response'>
+                            {results.text || ''}
+                        </pre>
+                    </div>
+                            </div>
                 </div>
-            </Uploader>
-            <br />
-            <Button 
-                size='lg'
-                color='pink'
-                appearance="primary"
-                style={{ float: 'right' }}
-                onClick={() => { handleUpload() }} className='upload-button' loading={loading}
-                disabled={fileList.length === 0}
-                >Gerar planilha
-            </Button>
-            </div>
-            <div className='orientation'>
-                <h3>Orientação</h3>
-                <p>Essa funcionalidade gera uma planilha para preenchimento dos atributos, onde cada linha representa um produto.</p>
-                <p>Você deve carregar uma planilha contendo as colunas com informações básicas do produto mostradas abaixo, onde a única obrigatória a estar preenchida é a coluna <strong>'NCM'</strong>.</p>
-                <p>Modelo da planilha que deve ser carregada: <br /></p>
-                <div className='table-container'>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Raíz</th>
-                            <th>NCM</th>
-                            <th>Descrição</th>
-                            <th>Denominação</th>
-                            <th>Código Interno</th>
-                            <th>Modalidade</th>
-                            <th>Situação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>12345678</td>
-                            <td>2203.00.00</td>
-                            <td>XXXXXXX</td>
-                            <td>YYYYYYY</td>
-                            <td>0000001</td>
-                            <td>IMPORTACAO</td>
-                            <td>ATIVADO</td>
-                        </tr>
-                    </tbody>
-                </table>
-                </div>
-            </div>
-        </div>
     )
 }
 

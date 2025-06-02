@@ -1,45 +1,39 @@
 import React from 'react';
 
 import { Link } from 'react-router-dom';
-import { Button } from 'rsuite';
 
 function Home() {
     return (
-        <div>
-            <h1>Catálogo de produtos</h1>
+        <div id='home'>
+            <h1>Comex Utils</h1>
             <h2>Escolha uma funcionalidade</h2>
-            {/* <nav>
-                <Button>
+            <nav>
+                <button>
                     <Link to="/consultar-produtos" className='link'>
-                        <p className='title'>Consultar produtos</p>
-                        <p className='description'>Consulte produtos já cadastrados do sistema.</p>
+                            <p className='title'>Consultar produtos</p>
                     </Link>
-                </Button>
-                <Button>
-                    <Link to="/gerar-planilha" className='link'>
-                        <p className='title'>Gerar planilha</p>
-                        <p className='description'>Gere a planilha para preenchimento dos atributos.</p>
-                    </Link>
-                </Button>
-                <Button>
+                </button>
+                <button>
                     <Link to="/cadastrar-produtos" className='link'>
-                        <p className='title'>Consultar produtos</p>
-                        <p className='description'>Consulte produtos já cadastrados do sistema.</p>
+                            <p className='title'>Cadastrar produtos</p>
                     </Link>
-                </Button>
-                <Button>
+                </button>
+                <button>
+                    <Link to="/gerar-planilha" className='link'>
+                            <p className='title'>Gerar planilha</p>
+                    </Link>
+                </button>
+                <button>
                     <Link to="/cadastrar-oes" className='link'>
-                        <p className='title'>Consultar produtos</p>
-                        <p className='description'>Consulte produtos já cadastrados do sistema.</p>
+                            <p className='title'>Cadastrar OEs</p>
                     </Link>
-                </Button>
-                <Button>
+                </button>
+                <button>
                     <Link to="/linkar-produtos" className='link'>
-                        <p className='title'>Consultar produtos</p>
-                        <p className='description'>Consulte produtos já cadastrados do sistema.</p>
+                            <p className='title'>Linkar produtos</p>
                     </Link>
-                </Button>
-            </nav> */}
+                </button>
+            </nav>
         </div>
     );
 };

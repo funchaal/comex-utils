@@ -3,10 +3,7 @@ import { useState, useRef, useEffect, useContext } from 'react'
 
 import { Uploader, Input, Button } from 'rsuite'
 
-import { AuthProvider, AuthContext } from '../AuthContext';
-
 function Header() {
-    const { setToken, setSetToken, csrfToken, setCsrfToken } = useContext(AuthContext)
   
     const [certificateShow, setCertificateShow] = useState(false)
     const [certificateDetails, setCertificateDetails] = useState(null)
@@ -44,13 +41,20 @@ function Header() {
           });
   
           const response_data = await response.json()
+
+          const sessionId = response_data['session-id']
+
+          console.log(response_data)
+
+          if (sessionId) {
+            // Define cookie para session-id, com path e tempo de expiração opcional
+            document.cookie = `session-id=${sessionId}; path=/; Secure; SameSite=Strict`;
+          }
   
           console.log(response_data)
   
           if (response_data.status == 'ok') {
             setConectionValidated(true)
-            setSetToken(response_data['set-token'])
-            setCsrfToken(response_data['csrf-token'])
           } else {
             setCertificateAuthenticationErrorMessage(String(response_data.message).includes('password') ? 'Senha incorreta.' : '')
           }

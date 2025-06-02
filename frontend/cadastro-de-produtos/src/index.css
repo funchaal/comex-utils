@@ -13,12 +13,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.rs-theme-dark {
+/* .rs-theme-dark {
   --rs-gray-900: rgba(33,34,44,255) !important;
   --rs-uploader-dnd-bg: rgba(40,42,54,255) !important;
   --rs-bg-card: rgba(40,42,54,255) !important;
   --rs-table-border-color: rgba(88,114,164,0.2) !important;
-}
+} */
 
 body, html, #root {
   width: 100%;
@@ -45,7 +45,7 @@ body {
   min-height: 100vh;
 }
 
-#root h1 {
+/* #root h1 {
   font-size: 2em;
   line-height: 1.5;
 }
@@ -59,4 +59,4 @@ body {
 #root h3 {
   font-weight: bold;
   font-size: 1.4em;
-}
+} */
