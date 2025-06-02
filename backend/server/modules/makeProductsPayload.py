@@ -53,7 +53,9 @@ def makeProductsPayload(products, attributes_json):
                     logic_string = '"' + str(base_attribute["valor"]) + '" ' + operador + ' "' + str(valor) + '"'
 
                     if composicao:
-                        logic_string = f'({logic_string}) {str(composicao).replace('||', 'or')} '
+                        # logic_string = f'({logic_string}) {str(composicao).replace('||', 'or')} '
+                        logic_string = '(' + logic_string + ') ' + str(composicao).replace('||', 'or') + ' '
+
                         get_logic_string(logic_string, condicao['condicao'])
                     else:
                         return logic_string
