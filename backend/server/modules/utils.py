@@ -109,7 +109,7 @@ def normalize_column_names(df):
     return df
 
 def get_relation_json(prod=False):
-    file_path = f'attributes_relation_{'prod' if prod else 'val'}.json'
+    file_path = f"attributes_relation_{'prod' if prod else 'val'}.json"
 
     # Verifica se o arquivo existe
     if os.path.exists(file_path):
@@ -118,7 +118,7 @@ def get_relation_json(prod=False):
         now = datetime.now()
 
         # Se o dia ou a hora forem diferentes, baixa novamente
-        if True or mtime.date() == now.date() or mtime.hour == now.hour:
+        if mtime.date() == now.date() and mtime.hour == now.hour:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
 
