@@ -5,7 +5,7 @@ import Results from '../components/Results';
 
 import formatJsonReadable from '../utils/formatJsonReadable';
 
-const prod = false
+const prod = true
 
 const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000'
 

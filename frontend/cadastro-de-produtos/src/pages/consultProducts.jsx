@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from 'rsuite';
 import Input from '../components/Input';
 
-const prod = false;
+const prod = true;
 
 const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000';
 
