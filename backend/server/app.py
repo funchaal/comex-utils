@@ -230,6 +230,8 @@ def authenticateCertificate():
 
     certificate_file = request.files['file']
     certificate_password = request.headers['password']
+
+    print(certificate_password)
     
     auth_response = autorizate(certificate_file, certificate_password, prod=PROD)
 

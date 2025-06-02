@@ -51,4 +51,5 @@ def autorizate(cert_path='', psw='', prod=False):
 
             return { 'set-token': set_token, 'csrf-token': csrf_token, 'exp': exp, 'status': response.status_code }
     except Exception as e:
-        return { 'status': response.status_code, 'message': f'{e}' }
+        print(e)
+        return { 'status': 500, 'message': f'{e}' }
