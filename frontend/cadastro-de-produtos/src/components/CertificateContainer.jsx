@@ -64,10 +64,11 @@ function CertificateContainer({ show, onClose }) {
     <div className="certificate-overlay" onClick={onClose}>
     <div className="certificate-container">
       <div className="certificate-modal" onClick={(e) => e.stopPropagation()}>
+        <div>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p style={{ textAlign: 'center', width: 'fit-content' }}>Adicione seu certificado .pfx</p>
+        <p className='certificate-modal-title'>Adicione seu certificado .pfx</p>
         <div className="modal-close-desktop">
-          <button onClick={onClose} className='x' style={{ fontSize: '1.2rem' }}>
+          <button onClick={onClose} className='x'>
           ✕
         </button>
         </div>
@@ -92,6 +93,7 @@ function CertificateContainer({ show, onClose }) {
         </Uploader>
         <div>
 
+            <br />
         <Input
           label="Senha do certificado"
           type="password"
@@ -103,7 +105,8 @@ function CertificateContainer({ show, onClose }) {
             <p className="error">{certificateAuthenticationErrorMessage}</p>
         )}
         </div>
-        <br />
+        </div>
+
         <Button
           color={conectionValidated ? 'green' : 'blue'}
           appearance="primary"
@@ -112,10 +115,10 @@ function CertificateContainer({ show, onClose }) {
           disabled={conectionValidated}
           style={{ borderRadius: '15px', height: '2.5rem' }}
           block
-        >
+          >
           {conectionValidated ? 'Autenticado!' : 'Autenticar'}
         </Button>
-      </div>
+            </div>
       </div>
     </div>
   )

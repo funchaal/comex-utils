@@ -1,18 +1,38 @@
-import React from 'react';
-import { useState, useRef, useEffect, useContext } from 'react'
+import React from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
-import { Routes, Route, Link } from "react-router-dom";
+function Menu({ isOpen, onClose }) {
+  const location = useLocation()
 
-function Menu() {
   return (
-    <div className='menu-container'>
+    <div className={`menu-container ${isOpen ? 'open' : ''}`}>
       <nav>
-        <ul>
-          <li><Link to='/gerar-planilha' className='link'>Gerar Planilha</Link></li>
-        </ul>
+            <Link
+              to='/gerar-planilha'
+              className={`link ${location.pathname === '/gerar-planilha' ? 'active' : ''}`}
+              // onClick={onClose}
+            >
+              Gerar Planilha
+            </Link>
+
+            <Link
+              to='/cadastrar-produtos'
+              className={`link ${location.pathname === '/cadastrar-produtos' ? 'active' : ''}`}
+              // onClick={onClose}
+            >
+              Cadastrar Produtos
+            </Link>
+
+            <Link
+              to='/consultar-produtos'
+              className={`link ${location.pathname === '/consultar-produtos' ? 'active' : ''}`}
+              // onClick={onClose}
+            >
+              Consultar Produtos
+            </Link>
       </nav>
     </div>
   )
 }
 
-export default Menu;
+export default Menu
