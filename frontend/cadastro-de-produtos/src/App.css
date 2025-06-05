@@ -73,7 +73,7 @@ nav button {
   width: 100%;
   height: fit-content;
   padding: 0 2%;
-  padding-top: 50px;
+  /* padding-top: 50px; */
   min-height: 100%;
 }
 

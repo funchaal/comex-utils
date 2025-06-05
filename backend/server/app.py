@@ -59,8 +59,9 @@ def consultProducts():
 
     if not raiz:
         return jsonify({'error': 'Missing "cpfCnpjRaiz" parameter'}), 400
-
-    raiz = raiz.strip().zfill(8)
+    
+    # Remove all non-digit characters and get the first 8 digits, left-padded with zeros if needed
+    raiz = ''.join(filter(str.isdigit, raiz))[:8].zfill(8)
     session_id = request.headers.get('session-id')
 
     print(session_id)
