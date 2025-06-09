@@ -52,15 +52,34 @@ def normalize_column_names(df):
         'ncm': ['ncm'],
         'descricao': ['descricao'],
         'denominacao': ['denominacao'],
-        'raiz': ['raiz', 'cnpj'],
+        'raiz': ['raiz', 'cnpj', 'cpf/cnpj raiz', 'cpf/cnpj', 'cpf'],
         'situacao': ['situacao'],
         'modalidade': ['modalidade'],
         'codigoInterno': [
             'codigo interno', 'cod interno',
             'codigo produto', 'cod produto'
         ], 
+        'codigoOperadorEstrangeiro': [
+            'codigo operador estrangeiro', 'codigo operador estrangeiro (sistema)', 'codigo operador',
+            'codigo oe', 'codigo op', 'cod operador estrangeiro', 'cod operador',
+            'cod oe', 'cod op'
+        ], 
+        'codigoProduto': [
+            'codigo produto', 'codigo produto (sistema)',
+            'codigo prod', 'cod produto', 'cod prod'
+        ], 
+        'cpfCnpjFabricante': [
+            'fabricante', 'cpf/cnpj fabricante',
+            'cnpj fabricante', 'cpf fabricante'
+        ], 
         'logradouro': [
             'logradouro', 'endereco'
+        ],
+        'vincular': [
+            'vincular'
+        ],
+        'conhecido': [
+            'conhecido'
         ],
         'nomeCidade': [
             'cidade', 'nome cidade', 'nome da cidade', 'municipio'

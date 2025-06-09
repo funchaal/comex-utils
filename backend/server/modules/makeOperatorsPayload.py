@@ -14,7 +14,7 @@ def makeOperatorsPayload(df):
 
         raiz = str(row.get('raiz', '')).replace('.', '').strip()[:8]
         nome = row.get('nome', '').strip()
-        logradouro = row.get('endereco', '').strip()
+        logradouro = row.get('logradouro', '').strip()
         cidade = row.get('cidade', '').strip()
         codigo_interno = str(row.get('codigo interno', '')).strip()
         codigo = str(row.get('codigo', '')).strip()
