@@ -31,7 +31,7 @@ function ConsultOperators() {
         try {
             setLoading(true);
 
-            const url = new URL(HOST + '/consult-products');
+            const url = new URL(HOST + '/consult-operators');
 
             // Obtendo session-id do cookie
             const sessionId = document.cookie
