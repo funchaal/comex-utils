@@ -306,7 +306,7 @@ def productsPayload():
         return jsonify(payload), 200
     
 @app.route('/operators-payload', methods=['POST'])
-def productsPayload():
+def operatorsPayload():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     
