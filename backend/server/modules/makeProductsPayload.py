@@ -3,7 +3,7 @@ import pandas as pd
 
 def makeProductsPayload(products, attributes_json):
     
-    payload = []
+    results = []
 
     errors = []
 
@@ -13,29 +13,42 @@ def makeProductsPayload(products, attributes_json):
 
         seq += 1
 
-        ncm = product.get('ncm', '')
-        descricao = product.get('descricao', '')
-        denominacao = product.get('denominacao', '')
-        raiz = product.get('raiz', '')
-        situacao = product.get('situacao', 'ATIVADO')
-        modalidade = product.get('modalidade', 'IMPORTACAO')
-        codigointerno = product.get('codigoInterno')
+        def clean(value):
+            return '' if value is None or str(value).lower() == 'nan' else value
+
+        codigo = clean(product.get('codigo'))
+        versao = clean(product.get('versao'))
+        ncm = clean(product.get('ncm'))
+        descricao = clean(product.get('descricao'))
+        denominacao = clean(product.get('denominacao'))
+        raiz = clean(product.get('raiz'))
+        situacao = clean(product.get('situacao', 'ATIVADO'))
+        modalidade = clean(product.get('modalidade', 'IMPORTACAO'))
+        codigointerno = clean(product.get('codigoInterno'))
+        attribute_array = product.get('atributos', [])
+
+
+        product_json = {'seq': seq}
+
+        # Só adiciona se existir no product
+        if codigo: product_json['codigo'] = codigo
+        if descricao: product_json['descricao'] = descricao
+        if denominacao: product_json['denominacao'] = denominacao
+        if raiz: product_json['cpfCnpjRaiz'] = raiz
+        if situacao: product_json['situacao'] = situacao
+        if modalidade: product_json['modalidade'] = modalidade
+        if ncm: product_json['ncm'] = ncm
+        if versao: product_json['versao'] = versao
+        if codigointerno: product_json['codigosInterno'] = [codigointerno]
+        
+
+        product_json['atributos'] = []
+        product_json['atributosCompostos'] = []
+        product_json['atributosMultivalorados'] = []
+
+        results.append(product_json)
 
         attribute_array = product['atributos']
-
-        payload.append({
-            'seq': seq, 
-            'descricao': descricao, 
-            'denominacao': denominacao, 
-            'cpfCnpjRaiz': raiz, 
-            'situacao': situacao, 
-            'modalidade': modalidade, 
-            'ncm': ncm, 
-            'codigosInterno': [codigointerno], 
-            'atributos': [], 
-            'atributosCompostos': [], 
-            'atributosMultivalorados': []
-        })
 
         def proccess_row(atribute_brute, cond_attr=False, obrigatorio=True, base_attribute=None, sub_attr=False, multivalue_attr=False):
 
@@ -49,13 +62,9 @@ def makeProductsPayload(products, attributes_json):
                     operador = condicao['operador']
                     valor = condicao['valor']
 
-                    # logic_string = f'"{base_attribute['valor']}" {operador} "{valor}"'
-                    logic_string = '"' + str(base_attribute["valor"]) + '" ' + operador + ' "' + str(valor) + '"'
-
+                    logic_string = f'"{base_attribute['valor']}" {operador} "{valor}"'
                     if composicao:
-                        # logic_string = f'({logic_string}) {str(composicao).replace('||', 'or')} '
-                        logic_string = '(' + logic_string + ') ' + str(composicao).replace('||', 'or') + ' '
-
+                        logic_string = f'({logic_string}) {str(composicao).replace('||', 'or')} '
                         get_logic_string(logic_string, condicao['condicao'])
                     else:
                         return logic_string
@@ -75,7 +84,7 @@ def makeProductsPayload(products, attributes_json):
             # Verifica se tem subatributos
             if len(atribute['listaSubatributos']) > 0:
 
-                payload[-1]['atributosCompostos'].append({
+                results[-1]['atributosCompostos'].append({
                     'atributo': attr_code, 
                     'valores': []
                 })
@@ -87,24 +96,8 @@ def makeProductsPayload(products, attributes_json):
 
             # Pega o valor do atributo
             for attr in attribute_array:
-
-                if attr['code'] == attr_code:
-                    valid_value = (attr['value'] != '' and not pd.isna(attr['value']) and not attr['value'] == 'nan')
-                    if valid_value and atribute.get('formaPreenchimento') in ('NUMERO_INTEIRO', 'LISTA_ESTATICA'):
-                        try:
-                            attr_value = str(int(attr['value']))
-                        except ValueError:
-                            errors.append({
-                                'seq': seq, 
-                                'atributo': attr_code, 
-                                'ncm': ncm,
-                                'nome': attr_name, 
-                                'valor': attr['value'], 
-                                'erro': 'Não foi possível converter o valor para inteiro.'
-                            })
-                            attr_value = str(attr['value']).strip()
-                    else:
-                        attr_value = str(attr['value']).strip()
+                if attr['code'] == attr_code or attr['name'] == str(attr_name).lower():
+                    attr_value = str(attr['value']).strip()
                     break
 
             if attr_value == 'nan' or pd.isna(attr_value):
@@ -114,14 +107,34 @@ def makeProductsPayload(products, attributes_json):
                 if obrigatorio:
                     errors.append({
                         'seq': seq, 
-                        'atributo': attr_code, 
                         'ncm': ncm,
-                        'nome': attr_name, 
-                        'valor': attr_value, 
-                        'erro': 'Não foi possível associar um valor.'
+                        'atributo': attr_code, 
+                        'nome': attr_name + (' (Condicional)' if cond_attr else '') + (' (SubAtributo)' if sub_attr else ''), 
+                        'valor': attr['value'], 
+                        'erro': 'Não foi possível converter o valor para inteiro.'
                     })
-                else:
-                    return
+                return
+            
+            if attr_code == 'ATT_11820':
+                pass
+
+            if atribute.get('formaPreenchimento') == 'LISTA_ESTATICA':
+                for item in atribute.get('dominio', []):
+                    if int(float(attr_value)) == int(float(item.get('codigo'))):
+                        attr_value = item.get('codigo')
+            
+            if atribute.get('formaPreenchimento') == 'NUMERO_INTEIRO':
+                try:
+                    attr_value = str(int(float(attr_value)))
+                except:
+                    errors.append({
+                        'seq': seq, 
+                        'ncm': ncm,
+                        'atributo': attr_code, 
+                        'nome': attr_name + (' (Condicional)' if cond_attr else '') + (' (SubAtributo)' if sub_attr else ''), 
+                        'valor': attr['value'], 
+                        'erro': 'Não foi possível converter o valor para inteiro.'
+                    })
                 
             if attr_value.lower() == 'sim':
                 attr_value = 'true'
@@ -129,7 +142,7 @@ def makeProductsPayload(products, attributes_json):
                 attr_value = 'false'
                 
             if sub_attr:
-                payload[-1]['atributosCompostos'][-1]['valores'].append({
+                results[-1]['atributosCompostos'][-1]['valores'].append({
                     'atributo': attr_code, 
                     'valor': attr_value
                 })
@@ -139,12 +152,12 @@ def makeProductsPayload(products, attributes_json):
                     attr_values = attr_value.split(',')
                     attr_values = [v.strip() for v in attr_values]
 
-                    payload[-1]['atributosMultivalorados'].append({
+                    results[-1]['atributosMultivalorados'].append({
                         'atributo': attr_code, 
                         'valores': attr_values
                     })
                 else:
-                    payload[-1]['atributos'].append({
+                    results[-1]['atributos'].append({
                             'atributo': attr_code, 
                             'valor': attr_value
                         })
@@ -159,9 +172,6 @@ def makeProductsPayload(products, attributes_json):
 
         for attr in ncm_dict['listaAtributos']:
 
-            # if attr['obrigatorio'] == False: 
-            #     continue
-
             # if attr['codigo'] == 'ATT_11920':
             #     continue
 
@@ -169,4 +179,4 @@ def makeProductsPayload(products, attributes_json):
 
             proccess_row(attr_dtls, obrigatorio=attr['obrigatorio'], multivalue_attr=attr['multivalorado'])
 
-    return payload, errors
+    return results, errors

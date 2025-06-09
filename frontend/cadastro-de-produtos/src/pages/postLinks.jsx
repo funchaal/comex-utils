@@ -9,7 +9,7 @@ const prod = true
 
 const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000'
 
-function PostProducts() {
+function PostLinks() {
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([]);
     const [stage, setStage] = useState(0);
@@ -41,7 +41,7 @@ function PostProducts() {
             const formData = new FormData();
             formData.append('file', data);
 
-            const url = HOST + '/products-payload';
+            const url = HOST + '/links-payload';
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -78,7 +78,7 @@ function PostProducts() {
             setLoading(true);
 
             const payload = results.content;
-            const url = HOST + '/post-products';
+            const url = HOST + '/post-links';
 
             // Obtendo session-id do cookie
             const sessionId = document.cookie
@@ -119,8 +119,8 @@ function PostProducts() {
             <div className="central-container">
 
             <div className='input-container'>
-                <h1>Cadastrar produtos</h1>
-                <h2>Cadastrar produtos no Portal Único.</h2>
+                <h1>Realizar Link</h1>
+                <h2>Linkar produtos e operadores estrangeiros no Portal Único.</h2>
                 <div className="drop-file-container">
                     <Uploader
                         action=""
@@ -169,4 +169,4 @@ function PostProducts() {
     );
 }
 
-export default PostProducts;
+export default PostLinks;

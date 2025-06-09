@@ -6,7 +6,7 @@ const prod = true;
 
 const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000';
 
-function ConsultProducts() {
+function ConsultOperators() {
     const [loading, setLoading] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [responseTitle, setResponseTitle] = useState('Nenhuma resposta por enquanto.');
@@ -99,8 +99,8 @@ function ConsultProducts() {
         <div id='gerar-planilha'>
             <div className="central-container">
                 <div className='input-container'>
-                    <h1>Consultar produtos</h1>
-                    <h2>Consultar produtos cadastrados.</h2>
+                    <h1>Consultar Operadores Estrangeiros</h1>
+                    <h2>Consultar operadores cadastrados.</h2>
                     <br /><br />
                     <Input 
                         type='text' 
@@ -140,4 +140,4 @@ function ConsultProducts() {
     );
 }
 
-export default ConsultProducts;
+export default ConsultOperators;

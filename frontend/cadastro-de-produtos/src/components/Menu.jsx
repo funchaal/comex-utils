@@ -16,6 +16,22 @@ function Menu({ isOpen, onClose }) {
             </Link>
 
             <Link
+              to='/consultar-produtos'
+              className={`link ${location.pathname === '/consultar-produtos' ? 'active' : ''}`}
+              // onClick={onClose}
+            >
+              Consultar Produtos
+            </Link>
+
+            <Link
+              to='/consultar-operadores'
+              className={`link ${location.pathname === '/consultar-operadores' ? 'active' : ''}`}
+              // onClick={onClose}
+            >
+              Consultar Operadores
+            </Link>
+
+            <Link
               to='/cadastrar-produtos'
               className={`link ${location.pathname === '/cadastrar-produtos' ? 'active' : ''}`}
               // onClick={onClose}
@@ -24,12 +40,21 @@ function Menu({ isOpen, onClose }) {
             </Link>
 
             <Link
-              to='/consultar-produtos'
-              className={`link ${location.pathname === '/consultar-produtos' ? 'active' : ''}`}
+              to='/cadastrar-operadores'
+              className={`link ${location.pathname === '/cadastrar-operadores' ? 'active' : ''}`}
               // onClick={onClose}
             >
-              Consultar Produtos
+              Cadastrar Operadores
             </Link>
+
+            <Link
+              to='/linkar-produtos'
+              className={`link ${location.pathname === '/linkar-produtos' ? 'active' : ''}`}
+              // onClick={onClose}
+            >
+              Linkar Produtos
+            </Link>
+
       </nav>
     </div>
   )

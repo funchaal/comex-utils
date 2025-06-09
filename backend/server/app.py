@@ -6,6 +6,10 @@ from modules.makeFillSheet import makeFillSheet
 
 from modules.makeProductsPayload import makeProductsPayload
 
+from modules.makeOperatorsPayload import makeOperatorsPayload
+
+from modules.makeLinksPayload import makeLinksPayload
+
 import pandas as pd
 
 import redis
@@ -83,64 +87,164 @@ def consultProducts():
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": set_token, 
+        "Authorization": set_token,
         "X-CSRF-Token": csrf_token
     }
 
     filters = {
-        'cpfCnpjRaiz': raiz, 
+        'cpfCnpjRaiz': raiz,
         'situacao': 0
     }
 
     try:
+        print("Enviando requisição para obter produtos...")
         response = requests.get(get_products_url, headers=headers, params=filters)
-        if response.status_code == 200:
-            results = response.json()
-        else:
-            return jsonify({
-                'error': 'Erro ao enviar requisição',
-                'status_code': response.status_code,
-                'details': response.text
-            }), response.status_code
-    except requests.exceptions.RequestException as e:
-        return jsonify({'error': f'Erro na conexão: {str(e)}'}), 500
 
-    # Criar Excel na memória
+        if response.status_code != 200:
+            print(f"Erro ao enviar requisição: {response.status_code}")
+            print("Detalhes:", response.text)
+            exit()
+
+        print("Requisição enviada com sucesso!")
+        results = response.json()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Erro na conexão: {e}")
+        exit()
+
+    all_attr_codes = sorted(set(
+        attr.get('atributo')
+        for product in results
+        for attr in product.get('atributos', [])
+    ))
+
+    registros = []
+    for product in results:
+        base = {
+            'Código': product.get('codigo', ''),
+            'NCM': product.get('ncm', ''),
+            'Raiz': product.get('cpfCnpjRaiz', ''),
+            'Descrição': product.get('descricao', ''),
+            'Denominação': product.get('denominacao', ''),
+            'Código Interno': product.get('codigosInterno', [''])[0],
+            'Modalidade': product.get('modalidade', ''),
+            'Situação': product.get('situacao', ''),
+            'Versão': product.get('versao', '')
+        }
+
+        attr_dict = {attr.get('atributo'): attr.get('valor') for attr in product.get('atributos', [])}
+        for code in all_attr_codes:
+            base[code] = attr_dict.get(code, '')
+        registros.append(base)
+
+    df_produtos = pd.DataFrame(registros)
+    relation_json = get_relation_json(prod=PROD)
+    final_wb = makeFillSheet(df_produtos, relation_json)
+    # Salvar em memória
+    output = BytesIO()
+    final_wb.save(output)
+    output.seek(0)
+
+    filename = f'products_{raiz}.xlsx'
+
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=filename
+    )
+
+@app.route('/consult-operators', methods=['GET'])
+def consultOperators():
+    """
+    Requisição JSON:
+    {
+        "raiz": "12345678"
+    }
+    Headers:
+    - session-id: <uuid>
+    """
+    raiz = request.args.get('cpfCnpjRaiz')  # pega o parâmetro da query string
+
+    print(raiz)
+
+    if not raiz:
+        return jsonify({'error': 'Missing "cpfCnpjRaiz" parameter'}), 400
+    
+    # Remove all non-digit characters and get the first 8 digits, left-padded with zeros if needed
+    raiz = ''.join(filter(str.isdigit, raiz))[:8].zfill(8)
+    session_id = request.headers.get('session-id')
+
+    print(session_id)
+
+    if not session_id:
+        return jsonify({'error': 'Missing "session-id" header'}), 400
+
+    tokens = r.get(session_id)
+    if not tokens:
+        return jsonify({"error": "Session expired or invalid"}), 401
+
+    tokens = json.loads(tokens)
+
+    set_token = tokens['set-token']
+    csrf_token = tokens['x-csrf-token']
+
+    root_url = 'https://portalunico.siscomex.gov.br' if PROD else 'https://val.portalunico.siscomex.gov.br'
+    get_oe_url = f'{root_url}/catp/api/ext/operador-estrangeiro'
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": set_token,
+        "X-CSRF-Token": csrf_token
+    }
+
+    filters = {
+        'cpfCnpjRaiz': raiz,
+        'situacao': 0
+    }
+
+    try:
+        print("Enviando requisição para obter operadores estrangeiros...")
+        response = requests.get(get_oe_url, headers=headers, params=filters)
+
+        if response.status_code != 200:
+            print(f"Erro ao enviar requisição: {response.status_code}")
+            print("Detalhes:", response.text)
+            exit()
+
+        print("Requisição enviada com sucesso!")
+        results = response.json()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Erro na conexão: {e}")
+        exit()
+
     wb = Workbook()
     ws = wb.active
+    ws.title = 'Operadores Estrangeiros'
 
-    for product in results:
-        codigos_interno = product.get('codigosInterno', [''])
+    ws.append([
+        'Código', 'Raiz', 'Nome', 'Situação',
+        'Logradouro', 'Nome Cidade', 'Código País', 'Código Interno'
+    ])
+
+    for oe in results:
         ws.append([
-            product.get('codigo', ''),
-            product.get('ncm', ''),
-            product.get('cpfCnpjRaiz', ''),
-            product.get('descricao', ''),
-            product.get('denominacao', ''),
-            codigos_interno[0] if codigos_interno else '',
-            product.get('modalidade', ''),
-            product.get('situacao', ''),
-            product.get('versao', '')
+            oe.get('codigo', ''),
+            oe.get('cpfCnpjRaiz', ''),
+            oe.get('nome', ''),
+            oe.get('situacao', ''),
+            oe.get('logradouro', ''),
+            oe.get('nomeCidade', ''),
+            oe.get('codigoPais', ''),
+            oe.get('codigoInterno', '')
         ])
-
-    # Cabeçalhos
-    ws.insert_rows(0)
-    ws['A1'] = 'Código'
-    ws['B1'] = 'NCM'
-    ws['C1'] = 'Raiz'
-    ws['D1'] = 'Descrição'
-    ws['E1'] = 'Denominação'
-    ws['F1'] = 'Código Interno'
-    ws['G1'] = 'Modalidade'
-    ws['H1'] = 'Situação'
-    ws['I1'] = 'Versão'
-
     # Salvar em memória
     output = BytesIO()
     wb.save(output)
     output.seek(0)
 
-    filename = f'products_{raiz}.xlsx'
+    filename = f'operators_{raiz}.xlsx'
 
     return send_file(
         output,
@@ -200,6 +304,44 @@ def productsPayload():
         return jsonify(errors), 422
     else:
         return jsonify(payload), 200
+    
+@app.route('/operators-payload', methods=['POST'])
+def productsPayload():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    df = pd.read_excel(file)
+
+    payload, errors = makeOperatorsPayload(df)
+
+    if len(errors) > 0:
+        return jsonify(errors), 422
+    else:
+        return jsonify(payload), 200
+    
+@app.route('/links-payload', methods=['POST'])
+def linksPayload():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    df = pd.read_excel(file)
+
+    payload, errors = makeLinksPayload(df)
+
+    if len(errors) > 0:
+        return jsonify(errors), 422
+    else:
+        return jsonify(payload), 200
 
 @app.route('/post-products', methods=['POST'])
 def postProducts():
@@ -214,6 +356,54 @@ def postProducts():
         return jsonify({"error": "Session expired or invalid"}), 401
 
     url_path = '/catp/api/ext/produto'
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": tokens['set-token'],
+        "X-CSRF-Token": tokens['x-csrf-token']
+    }
+
+    response = post_payload(url_path=url_path, headers=headers, payload=payload, chunk_size=100, prod=PROD)
+
+    return jsonify(response)
+
+@app.route('/post-operators', methods=['POST'])
+def postOperators():
+    session_id = request.headers['session-id']
+    payload = request.json['payload']
+
+    tokens = r.get(session_id)
+
+    if tokens:
+        tokens = json.loads(tokens)
+    else:
+        return jsonify({"error": "Session expired or invalid"}), 401
+
+    url_path = '/catp/api/ext/operador-estrangeiro'
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": tokens['set-token'],
+        "X-CSRF-Token": tokens['x-csrf-token']
+    }
+
+    response = post_payload(url_path=url_path, headers=headers, payload=payload, chunk_size=100, prod=PROD)
+
+    return jsonify(response)
+
+@app.route('/post-links', methods=['POST'])
+def postLinks():
+    session_id = request.headers['session-id']
+    payload = request.json['payload']
+
+    tokens = r.get(session_id)
+
+    if tokens:
+        tokens = json.loads(tokens)
+    else:
+        return jsonify({"error": "Session expired or invalid"}), 401
+
+    url_path = '/catp/api/ext/fabricante'
 
     headers = {
         "Content-Type": "application/json",
