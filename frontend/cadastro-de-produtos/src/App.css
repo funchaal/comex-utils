@@ -666,7 +666,7 @@ header {
   display: grid;
   height: 100%;
   grid-template-columns: minmax(0, 1fr) minmax(450px, 3fr) minmax(0, 1fr);
-  grid-template-rows: minmax(80px, 2fr) 2fr 2fr 1fr;
+  grid-template-rows: minmax(60px, 2fr) 2fr 2fr 1fr;
   align-items: center;
 }
 
@@ -687,7 +687,7 @@ header {
     display: grid;
     height: 100%;
     grid-template-columns: 0 1fr 0;
-    grid-template-rows: minmax(80px, 2fr) 2fr 2fr 1fr;
+    grid-template-rows: minmax(60px, 1fr) 2fr 2fr 1fr;
     align-items: center;
     padding: 0 3vw;
   }

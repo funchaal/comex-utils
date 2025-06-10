@@ -86,7 +86,7 @@ function ConsultOperators() {
 
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'consult_products.xlsx');
+            link.setAttribute('download', 'consult_operators.xlsx');
             document.body.appendChild(link);
             link.click();
 
