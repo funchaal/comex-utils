@@ -5,8 +5,12 @@ import { AuthContext } from '../AuthContext'
 
 import Input from './Input'
 
-const prod = true
-const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000'
+
+// utils/config.js
+export const HOST = import.meta.env.MODE === 'production'
+  ? 'https://comex-utils.onrender.com'
+  : 'http://127.0.0.1:5000';
+
 
 function CertificateContainer({ show, onClose }) {
     const { setCertificate, setCertificatePassword, certificatePassword } = useContext(AuthContext)

@@ -2,31 +2,34 @@ import React, { useState, useEffect } from 'react';
 
 import { Button, Uploader } from 'rsuite';
 
-const prod = true;
-const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000'
+// utils/config.js
+export const HOST = import.meta.env.MODE === 'production'
+  ? 'https://comex-utils.onrender.com'
+  : 'http://127.0.0.1:5000';
 
+
+import JsonCardViwer from '../components/JsonCardViwer';
 
 function GerarPlanilha() {
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([]);
 
     const [responseTitle, setResponseTitle] = useState('Nenhuma resposta por enquanto.');
-        const [responseColor, setResponseColor] = useState('neutral');
+        const [responseClass, setResponseClass] = useState('');
         const [results, setResults] = useState({
-            response: [], 
-            status: null, 
-            text: ''
+            content: [], 
+            status: null
         });
     
         useEffect(() => {
             if (results.status) {
                 if (results.status === 200) {
-                    setResponseColor('ok')
+                    setResponseClass('ok')
                 } else {
-                    setResponseColor('error')
+                    setResponseClass('error')
                 }
             } else {
-                setResponseColor('neutral');
+                setResponseClass('');
             }
         }, [results]);
     
@@ -50,15 +53,16 @@ function GerarPlanilha() {
 
             handleDownload(file);
 
-            if (response.status === 200) {
+            const status = response.status
+
+            if (status === 200) {
                 setResponseTitle('Planilha gerada com sucesso!');
             } else {
                 setResponseTitle('Erro ao gerar a planilha.');
             }
             setResults({
-                response: [],
-                status: response.status,
-                text: ''
+                content: [],
+                status: status
             });
 
         } catch (error) {
@@ -92,52 +96,48 @@ function GerarPlanilha() {
         }
     }
 
-    return(
-        <div id='gerar-planilha'>
-                    <div className="central-container">
-        
-                    <div className='input-container'>
-                        <h1>Gerar planilha</h1>
-                        <h2>Gerar planilha para preenchimento dos atributos.</h2>
-                        <div className="drop-file-container">
-                            <Uploader
-                                action=""
-                                draggable
-                                autoUpload={false}
-                                multiple={false}
-                                onChange={(fileList) => setFileList(fileList)}
-                                >
-                                <div className='drop-file'>
-                                    <p>Click or Drag files to this area to upload</p>
-                                </div>
-                            </Uploader>
-                    </div>
-        
-                        <br />
-        
-                        <Button
-                            size='lg'
-                            color='pink'
-                            appearance="primary"
-                            style={{ float: 'right' }}
-                            onClick={() => { handleUpload() }}
-                            className='upload-button'
-                            loading={loading}
-                            >
-                            Gerar
-                        </Button>
-                    </div>
-        
-                    <br />
-                    <div className={`response-container ${responseColor}`}>
-                        <p>{ responseTitle }</p>
-                        <pre className='response'>
-                            {results.text || ''}
-                        </pre>
-                    </div>
-                            </div>
+        return (
+        <div id='post-operators' className='main-container'>
+            <div className='input-container'>
+                <h1>Gerar planilha</h1>
+                <h2>Gerar planilha para preenchimento dos atributos.</h2>
+                <div className="drop-file-container">
+                    <Uploader
+                        action=""
+                        draggable
+                        autoUpload={false}
+                        multiple={false}
+                        onChange={(fileList) => setFileList(fileList)}
+                        >
+                        <div className='drop-file'>
+                            <p>Click or Drag files to this area to upload</p>
+                        </div>
+                    </Uploader>
                 </div>
-    )
+
+                <br />
+
+                <Button
+                    size='lg'
+                    color='pink'
+                    appearance="primary"
+                    style={{ float: 'right' }}
+                    onClick={() => { handleUpload() }}
+                    className='upload-button'
+                    loading={loading}
+                    >
+                    Gerar
+                </Button>
+            </div>
+
+            <br />
+            
+            <div className={`response-container ${responseClass}`}>
+                <p>{ responseTitle }</p>
+                <JsonCardViwer data={results.content} />
+            </div>
+        </div>
+    );
 }
 
 export default GerarPlanilha;

@@ -180,6 +180,8 @@ def excel_to_dict(df):
         ncm = ncm.zfill(8)
 
         descricao = str(row.get('descricao', '')).strip()
+        codigo = str(row.get('codigo', '')).strip()
+        versao = str(row.get('versao', '')).strip()
         denominacao = str(row.get('denominacao', '')).strip()
 
         raiz = str(row.get('raiz', '')).replace('.', '').strip()[:8]
@@ -192,21 +194,29 @@ def excel_to_dict(df):
         atributos = []
         
         for col in df.columns:
-            if col not in ('ncm', 'descricao', 'denominacao', 'codigoInterno', 'raiz', 'situacao', 'modalidade'):
+            if col not in ('codigo', 'versao', 'ncm', 'descricao', 'denominacao', 'codigoInterno', 'raiz', 'situacao', 'modalidade'):
                 value = row[col]
 
                 if '\n\n' in col:
                     col = col.split('\n\n')[0]
                 match = re.match(r'^(ATT_\d+)\s*-\s*(.*)$', col)
+
                 if match:
                     code = match.group(1).strip()
                     name = match.group(2).strip().lower()
                 else:
-                    code = None
-                    name = col
+                    match_alt = re.match(r'^(ATT_\d+)$', col.strip())
+                    if match_alt:
+                        code = match_alt.group(1).strip()
+                        name = ''
+                    else:
+                        code = None
+                        name = col
                 atributos.append({'code': str(code).strip(), 'name': str(name).strip().lower(), 'value': value})
 
         results.append({
+            'codigo': codigo, 
+            'versao': versao, 
             'ncm': ncm, 
             'raiz': raiz, 
             'descricao': descricao, 

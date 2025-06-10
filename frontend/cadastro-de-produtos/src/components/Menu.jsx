@@ -10,7 +10,7 @@ function Menu({ isOpen, onClose }) {
             <Link
               to='/gerar-planilha'
               className={`link ${location.pathname === '/gerar-planilha' ? 'active' : ''}`}
-              // onClick={onClose}
+              onClick={onClose}
             >
               Gerar Planilha
             </Link>
@@ -18,7 +18,7 @@ function Menu({ isOpen, onClose }) {
             <Link
               to='/consultar-produtos'
               className={`link ${location.pathname === '/consultar-produtos' ? 'active' : ''}`}
-              // onClick={onClose}
+              onClick={onClose}
             >
               Consultar Produtos
             </Link>
@@ -26,7 +26,7 @@ function Menu({ isOpen, onClose }) {
             <Link
               to='/consultar-operadores'
               className={`link ${location.pathname === '/consultar-operadores' ? 'active' : ''}`}
-              // onClick={onClose}
+              onClick={onClose}
             >
               Consultar Operadores
             </Link>
@@ -34,7 +34,7 @@ function Menu({ isOpen, onClose }) {
             <Link
               to='/cadastrar-produtos'
               className={`link ${location.pathname === '/cadastrar-produtos' ? 'active' : ''}`}
-              // onClick={onClose}
+              onClick={onClose}
             >
               Cadastrar Produtos
             </Link>
@@ -42,7 +42,7 @@ function Menu({ isOpen, onClose }) {
             <Link
               to='/cadastrar-operadores'
               className={`link ${location.pathname === '/cadastrar-operadores' ? 'active' : ''}`}
-              // onClick={onClose}
+              onClick={onClose}
             >
               Cadastrar Operadores
             </Link>
@@ -50,7 +50,7 @@ function Menu({ isOpen, onClose }) {
             <Link
               to='/linkar-produtos'
               className={`link ${location.pathname === '/linkar-produtos' ? 'active' : ''}`}
-              // onClick={onClose}
+              onClick={onClose}
             >
               Linkar Produtos
             </Link>

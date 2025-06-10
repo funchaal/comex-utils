@@ -300,6 +300,7 @@ def productsPayload():
 
     payload, errors = makeProductsPayload(products, relation_json)
 
+    print(errors)
     if len(errors) > 0:
         return jsonify(errors), 422
     else:

@@ -81,11 +81,12 @@ nav button {
   font-size: 2.4em;
   /* line-height: 1.5; */
   font-weight: 800;
+  text-align: center;
+  line-height: 2.3rem;
 }
 
 #root h2 {
   font-size: 1.3em;
-  line-height: 1;
   font-weight: normal;
 }
 
@@ -111,6 +112,53 @@ nav button {
   background-color: rgb(249, 249, 249) !important;
   border: 1px dashed #0d0d0d3b !important;
 }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  background-color: #f9fafb;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  margin-top: 8px;
+}
+
+.value {
+  font-size: 14px;
+  color: #111827;
+  margin-left: 4px;
+}
+
+.nested-container {
+  margin-top: 4px;
+}
+
+.nested-block {
+  border-left: 2px solid #e5e7eb;
+  margin-left: 4px;
+  padding-left: 8px;
+}
+
 
 .input-container {
   display: flex;
@@ -175,15 +223,13 @@ header {
 
 .response-container {
   width: 100%;
-  min-height: 100px;
+  height: 100px;
   max-height: 400px;
   padding: 20px;
-  margin-top: 20px;
   border-radius: 12px;
   overflow-y: auto;
   background-color: rgb(249, 249, 249);
   border: 1px solid #ddd;
-  margin-bottom: 3vh;
 }
 .response-container p {
   margin-bottom: 10px;
@@ -407,14 +453,18 @@ header {
 }
 
 .header-cert-btn {
-  padding: 10px 15px;
+  padding: 8px 12px;
   border: 1px solid rgba(0, 0, 0, 0.389);
   border-radius: 30px;
   background-color: transparent;
   color: rgb(0, 0, 0);
   cursor: pointer;
-  text-wrap: nowrap;
+  font-size: 0.8rem;
+  white-space: nowrap;
   font-weight: 700;
+  text-overflow: ellipsis;
+  max-width: 35vw;
+  overflow: hidden;
 }
 
 .x {
@@ -602,7 +652,7 @@ header {
 }
 
 #root .header-title-container h1 {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   margin-left: 20px;
   color: #272727;
   /* font-weight: 500; */
@@ -610,4 +660,24 @@ header {
 
 .header-button-container button {
   margin-left: 10px;
+}
+
+.main-container {
+  display: grid;
+  height: 100%;
+  grid-template-columns: minmax(0, 1fr) minmax(450px, 3fr) minmax(0, 1fr);
+  grid-template-rows: minmax(80px, 2fr) 2fr 2fr 1fr;
+  align-items: center;
+}
+
+.input-container {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+.response-container {
+  grid-column: 2 / 3;
+  grid-row: 3 / 4;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }

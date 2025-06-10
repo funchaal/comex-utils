@@ -2,34 +2,38 @@ import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../AuthContext';
 import { Button, Uploader } from 'rsuite';
 import Results from '../components/Results';
+import JsonCardViwer from '../components/JsonCardViwer'
 
 import formatJsonReadable from '../utils/formatJsonReadable';
 
 const prod = true
 
-const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000'
+// utils/config.js
+export const HOST = import.meta.env.MODE === 'production'
+  ? 'https://comex-utils.onrender.com'
+  : 'http://127.0.0.1:5000';
+
 
 function PostOperators() {
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([]);
     const [stage, setStage] = useState(0);
     const [responseTitle, setResponseTitle] = useState('Nenhuma resposta por enquanto.');
-    const [responseColor, setResponseColor] = useState('neutral');
+    const [responseClass, setResponseClass] = useState('');
     const [results, setResults] = useState({
-        response: [], 
-        status: null, 
-        text: ''
+        content: [], 
+        status: null
     });
 
     useEffect(() => {
         if (results.status) {
             if (results.status === 200) {
-                setResponseColor('ok')
+                setResponseClass('ok')
             } else {
-                setResponseColor('error')
+                setResponseClass('error')
             }
         } else {
-            setResponseColor('neutral');
+            setResponseClass('');
         }
     }, [results]);
 
@@ -51,12 +55,9 @@ function PostOperators() {
             const status = response.status;
             const content = await response.json();
 
-            const formattedText = formatJsonReadable(content);
-
             setResults({
-                response: content,
-                status: status,
-                text: formattedText
+                content: content,
+                status: status
             });
 
             if (status === 200) {
@@ -94,13 +95,12 @@ function PostOperators() {
                 body: JSON.stringify(payload)
             });
 
+            const status = response.status
             const content = await response.json();
-            const formattedText = formatJsonReadable(content);
 
             setResults({
                 content: content,
-                status: response.status,
-                text: formattedText
+                status: status
             });
 
             setResponseTitle('Verifique a resposta do servidor abaixo.');
@@ -115,9 +115,7 @@ function PostOperators() {
     }
 
     return (
-        <div id='gerar-planilha'>
-            <div className="central-container">
-
+        <div id='post-operators' className='main-container'>
             <div className='input-container'>
                 <h1>Cadastrar Operadores Estrangeiros</h1>
                 <h2>Cadastrar operadores no Portal Único.</h2>
@@ -133,7 +131,7 @@ function PostOperators() {
                             <p>Click or Drag files to this area to upload</p>
                         </div>
                     </Uploader>
-            </div>
+                </div>
 
                 <br />
 
@@ -145,26 +143,21 @@ function PostOperators() {
                     onClick={() => { stage === 0 ? handleUpload() : handleConfirm() }}
                     className='upload-button'
                     loading={loading}
-                    disabled={fileList.length === 0 || (stage === 1 && results.errors.length > 0)}
+                    disabled={
+                        fileList.length === 0 ||
+                        (stage === 1 && results.status !== 200)
+                        }
                     >
                     {stage === 0 ? 'Upload' : 'Confirmar'}
                 </Button>
             </div>
 
             <br />
-            <div className={`response-container ${responseColor}`}>
+            
+            <div className={`response-container ${responseClass}`}>
                 <p>{ responseTitle }</p>
-                <pre className='response'>
-                    {results.text || ''}
-                </pre>
+                <JsonCardViwer data={results.content} />
             </div>
-                    </div>
-                    {/* <div className='help'>
-                    <h3>Modo de usar:</h3>
-                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-</p>
-                    </div> */}
         </div>
     );
 }

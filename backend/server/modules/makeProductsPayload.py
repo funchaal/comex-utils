@@ -62,13 +62,9 @@ def makeProductsPayload(products, attributes_json):
                     operador = condicao['operador']
                     valor = condicao['valor']
 
-                    # logic_string = f'"{base_attribute['valor']}" {operador} "{valor}"'
-                    logic_string = '"' + base_attribute['valor'] + '" ' + operador + ' "' + valor + '"'
-
+                    logic_string = f'"{base_attribute['valor']}" {operador} "{valor}"'
                     if composicao:
-                        # logic_string = f'({logic_string}) {str(composicao).replace('||', 'or')} '
-                        logic_string = '(' + logic_string + ') ' + str(composicao).replace('||', 'or') + ' '
-
+                        logic_string = f'({logic_string}) {str(composicao).replace('||', 'or')} '
                         get_logic_string(logic_string, condicao['condicao'])
                     else:
                         return logic_string
@@ -108,6 +104,12 @@ def makeProductsPayload(products, attributes_json):
                 attr_value = ''
             
             if not attr_value:
+                print(attr_code)
+                print(attr_value)
+                print(attr_value == 'nan')
+                print(pd.isna(attr_value))
+                print(obrigatorio)
+                print('\n\n')
                 if obrigatorio:
                     errors.append({
                         'seq': seq, 

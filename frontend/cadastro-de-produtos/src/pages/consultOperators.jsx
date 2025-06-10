@@ -2,15 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Button } from 'rsuite';
 import Input from '../components/Input';
 
-const prod = true;
 
-const HOST = prod ? 'https://comex-utils.onrender.com' : 'http://127.0.0.1:5000';
+
+// utils/config.js
+export const HOST = import.meta.env.MODE === 'production'
+  ? 'https://comex-utils.onrender.com'
+  : 'http://127.0.0.1:5000';
+;
 
 function ConsultOperators() {
     const [loading, setLoading] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [responseTitle, setResponseTitle] = useState('Nenhuma resposta por enquanto.');
-    const [responseColor, setResponseColor] = useState('neutral');
+    const [responseClass, setResponseClass] = useState('');
     const [results, setResults] = useState({
         status: null,
     });
@@ -18,12 +22,12 @@ function ConsultOperators() {
     useEffect(() => {
         if (results.status) {
             if (results.status === 200) {
-                setResponseColor('ok');
+                setResponseClass('ok');
             } else {
-                setResponseColor('error');
+                setResponseClass('error');
             }
         } else {
-            setResponseColor('neutral');
+            setResponseClass('');
         }
     }, [results]);
 
@@ -68,7 +72,7 @@ function ConsultOperators() {
         } catch (error) {
             console.error('Erro ao enviar requisição:', error);
             setResponseTitle('Erro inesperado ao enviar a consulta.');
-            setResponseColor('error');
+            setResponseClass('error');
         } finally {
             setLoading(false);
         }
@@ -91,15 +95,13 @@ function ConsultOperators() {
         } catch (error) {
             console.error('Erro ao baixar o arquivo:', error);
             setResponseTitle('Erro ao baixar o arquivo.');
-            setResponseColor('error');
+            setResponseClass('error');
         }
     }
-
     return (
-        <div id='gerar-planilha'>
-            <div className="central-container">
-                <div className='input-container'>
-                    <h1>Consultar Operadores Estrangeiros</h1>
+        <div id='post-operators' className='main-container'>
+            <div className='input-container'>
+                <h1>Consultar operadores estrangeiros</h1>
                     <h2>Consultar operadores cadastrados.</h2>
                     <br /><br />
                     <Input 
@@ -123,18 +125,13 @@ function ConsultOperators() {
                     >
                         Enviar
                     </Button>
-                </div>
+            </div>
 
-                <br />
-                <div className={`response-container ${responseColor}`}>
-                    <p>{responseTitle}</p>
-                </div>
-                {/* <div>
-                    <h3>Modo de usar:</h3>
-                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-</p>
-                </div> */}
+            <br />
+            
+            <div className={`response-container ${responseClass}`}>
+                <p>{ responseTitle }</p>
+                {/* <JsonCardViwer data={results.content} /> */}
             </div>
         </div>
     );
