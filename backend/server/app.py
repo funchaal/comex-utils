@@ -261,7 +261,7 @@ def consultOperators():
     )
 
 @app.route('/consult-links', methods=['GET'])
-def consult_links():
+def consultLinks():
     """
     Exemplo de requisição:
     GET /consult-links?cpfCnpjRaiz=12345678
@@ -278,7 +278,6 @@ def consult_links():
     if not session_id:
         return jsonify({'error': 'Missing "session-id" header'}), 400
 
-    # Recuperar tokens da sessão
     tokens = r.get(session_id)
     if not tokens:
         return jsonify({"error": "Session expired or invalid"}), 401
@@ -287,7 +286,6 @@ def consult_links():
     set_token = tokens['set-token']
     csrf_token = tokens['x-csrf-token']
 
-    # URL correta para exportar os vínculos
     root_url = 'https://portalunico.siscomex.gov.br' if PROD else 'https://val.portalunico.siscomex.gov.br'
     url = f'{root_url}/catp/api/ext/fabricante/exportar/{raiz}'
 
@@ -310,26 +308,49 @@ def consult_links():
         with zip_file.open(json_filename) as json_file:
             json_data = json.load(json_file)
 
-        # Converter JSON para DataFrame
-        df = pd.DataFrame(json_data)
-
-        # Gerar Excel
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Vínculos')
-
-        output.seek(0)
-        filename = f'vinculos_{raiz}.xlsx'
-
-        return send_file(
-            output,
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            as_attachment=True,
-            download_name=filename
-        )
-
     except Exception as e:
         return jsonify({'error': 'Erro inesperado', 'details': str(e)}), 500
+
+    # Criar planilha com openpyxl
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Vínculos'
+
+    # Cabeçalhos mais legíveis
+    ws.append([
+        'seq',
+        'Código País',
+        'Raíz',
+        'Código Operador Estrangeiro',
+        'Conhecido',
+        'Código Produto',
+        'Vincular'
+    ])
+
+    for item in json_data:
+        ws.append([
+            item.get('seq', ''),
+            item.get('codigoPais', ''),
+            item.get('cpfCnpjRaiz', ''),
+            item.get('codigoOperadorEstrangeiro', ''),
+            item.get('conhecido', ''),
+            item.get('codigoProduto', ''),
+            item.get('vincular', '')
+        ])
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    filename = f'vinculos_{raiz}.xlsx'
+
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=filename
+    )
+
 
 
 @app.route('/make-sheet', methods=['POST'])
