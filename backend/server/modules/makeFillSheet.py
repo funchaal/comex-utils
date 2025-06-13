@@ -1,5 +1,4 @@
 import os
-from io import BytesIO
 
 import pandas as pd
 
@@ -28,6 +27,7 @@ def makeFillSheet(products, relation_json):
         raiz = str(row.get('raiz')).replace('.', '')[:8]
         raiz = raiz.zfill(8)
 
+        codigo = row.get('codigo')
         descricao = row.get('descricao')
         denominacao = row.get('denominacao')
         codigoInterno = row.get('codigoInterno')
@@ -35,6 +35,7 @@ def makeFillSheet(products, relation_json):
         situacao = row.get('situacao', 'ATIVADO')
 
         base_info = {
+            'Código': codigo,
             'NCM': ncm,
             'Raíz (CNPJ)': raiz,
             'Código Interno': codigoInterno,
@@ -146,7 +147,7 @@ def makeFillSheet(products, relation_json):
 
 def convert_to_excel(data):
     # Identificar todas as colunas fixas e dinâmicas
-    fixed_columns = ["NCM", "Raíz (CNPJ)", "Descrição", "Denominação", "Código Interno", "Modalidade", "Situação"]
+    fixed_columns = ["Código", "NCM", "Raíz (CNPJ)", "Descrição", "Denominação", "Código Interno", "Modalidade", "Situação"]
     attribute_columns = []
     
     for row in data:

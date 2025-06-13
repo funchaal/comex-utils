@@ -28,6 +28,9 @@ from openpyxl import Workbook
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
+import zipfile
+import io
+
 app = Flask(__name__)
 CORS(app)
 
@@ -119,14 +122,18 @@ def consultProducts():
     ))
 
     registros = []
+
     for product in results:
+        codigos_interno = product.get('codigosInterno')
+        print(codigos_interno)
         base = {
             'Código': product.get('codigo', ''),
             'NCM': product.get('ncm', ''),
             'Raiz': product.get('cpfCnpjRaiz', ''),
             'Descrição': product.get('descricao', ''),
             'Denominação': product.get('denominacao', ''),
-            'Código Interno': product.get('codigosInterno', [''])[0],
+            # 'Código Interno': product.get('codigosInterno', [''])[0],
+            'Código Interno': codigos_interno[0] if isinstance(codigos_interno, list) and codigos_interno else '', 
             'Modalidade': product.get('modalidade', ''),
             'Situação': product.get('situacao', ''),
             'Versão': product.get('versao', '')
@@ -252,6 +259,78 @@ def consultOperators():
         as_attachment=True,
         download_name=filename
     )
+
+@app.route('/consult-links', methods=['GET'])
+def consult_links():
+    """
+    Exemplo de requisição:
+    GET /consult-links?cpfCnpjRaiz=12345678
+    Headers:
+    - session-id: <uuid>
+    """
+    raiz = request.args.get('cpfCnpjRaiz')
+    if not raiz:
+        return jsonify({'error': 'Missing "cpfCnpjRaiz" parameter'}), 400
+
+    raiz = ''.join(filter(str.isdigit, raiz))[:8].zfill(8)
+
+    session_id = request.headers.get('session-id')
+    if not session_id:
+        return jsonify({'error': 'Missing "session-id" header'}), 400
+
+    # Recuperar tokens da sessão
+    tokens = r.get(session_id)
+    if not tokens:
+        return jsonify({"error": "Session expired or invalid"}), 401
+
+    tokens = json.loads(tokens)
+    set_token = tokens['set-token']
+    csrf_token = tokens['x-csrf-token']
+
+    # URL correta para exportar os vínculos
+    root_url = 'https://portalunico.siscomex.gov.br' if PROD else 'https://val.portalunico.siscomex.gov.br'
+    url = f'{root_url}/catp/api/ext/fabricante/exportar/{raiz}'
+
+    headers = {
+        "Authorization": set_token,
+        "X-CSRF-Token": csrf_token
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            return jsonify({'error': 'Erro ao baixar ZIP', 'status': response.status_code, 'details': response.text}), 500
+
+        # Abrir ZIP em memória
+        zip_file = zipfile.ZipFile(io.BytesIO(response.content))
+        json_filename = next((f for f in zip_file.namelist() if f.endswith('.json')), None)
+        if not json_filename:
+            return jsonify({'error': 'Arquivo JSON não encontrado no ZIP'}), 500
+
+        with zip_file.open(json_filename) as json_file:
+            json_data = json.load(json_file)
+
+        # Converter JSON para DataFrame
+        df = pd.DataFrame(json_data)
+
+        # Gerar Excel
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Vínculos')
+
+        output.seek(0)
+        filename = f'vinculos_{raiz}.xlsx'
+
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+
+    except Exception as e:
+        return jsonify({'error': 'Erro inesperado', 'details': str(e)}), 500
+
 
 @app.route('/make-sheet', methods=['POST'])
 def makeSheet():

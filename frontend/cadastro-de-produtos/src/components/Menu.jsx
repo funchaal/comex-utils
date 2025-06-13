@@ -32,6 +32,14 @@ function Menu({ isOpen, onClose }) {
             </Link>
 
             <Link
+              to='/consultar-vinculos'
+              className={`link ${location.pathname === '/consultar-vinculos' ? 'active' : ''}`}
+              onClick={onClose}
+            >
+              Consultar Vínculos
+            </Link>
+
+            <Link
               to='/cadastrar-produtos'
               className={`link ${location.pathname === '/cadastrar-produtos' ? 'active' : ''}`}
               onClick={onClose}

@@ -18,6 +18,7 @@ import PostProducts from './pages/postProducts';
 import PostOperators from './pages/postOperators';
 import ConsultOperators from './pages/consultOperators';
 import PostLinks from './pages/postLinks';
+import ConsultLinks from './pages/consultLinks';
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/gerar-planilha" element={<GerarPlanilha />}/>
           <Route path="/consultar-produtos" element={<ConsultProducts />}/>
           <Route path="/consultar-operadores" element={<ConsultOperators />}/>
+          <Route path="/consultar-vinculos" element={<ConsultLinks />}/>
           <Route path="/cadastrar-produtos" element={<PostProducts />}/>
           <Route path="/cadastrar-operadores" element={<PostOperators />}/>
           <Route path="/linkar-produtos" element={<PostLinks />}/>
