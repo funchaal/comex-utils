@@ -74,44 +74,45 @@ function PostProducts() {
     }
 
     async function handleConfirm() {
-        try {
-            setLoading(true);
+    try {
+        setLoading(true);
 
-            const payload = results.content;
-            const url = HOST + '/post-products';
+        const payload = results.content;
+        const url = HOST + '/post-products';
 
-            // Obtendo session-id do cookie
-            const sessionId = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('session-id='))
-                ?.split('=')[1];
+        // Obtendo session-id do cookie
+        const sessionId = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('session-id='))
+            ?.split('=')[1];
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'session-id': sessionId || ''
-                },
-                body: JSON.stringify(payload)
-            });
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // <-- necessário
+                'session-id': sessionId || ''
+            },
+            body: JSON.stringify(payload)
+        });
 
-            const status = response.status;
-            const content = await response.json();
+        const status = response.status;
+        const content = await response.json();
 
-            setResults({
-                content: content,
-                status: status
-            });
+        setResults({
+            content: content,
+            status: status
+        });
 
-            setResponseTitle('Verifique a resposta do servidor abaixo.');
+        setResponseTitle('Verifique a resposta do servidor abaixo.');
+        setStage(0);
 
-            setStage(0);
-
-        } catch (error) {
-            console.error('Erro ao confirmar:', error);
-        } finally {
-            setLoading(false);
-        }
+    } catch (error) {
+        console.error('Erro ao confirmar:', error);
+    } finally {
+        setLoading(false);
     }
+}
+
 
     return (
         <div id='post-operators' className='main-container'>

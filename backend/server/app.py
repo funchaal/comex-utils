@@ -129,7 +129,7 @@ def consultProducts():
         base = {
             'Código': product.get('codigo', ''),
             'NCM': product.get('ncm', ''),
-            'Raiz': product.get('cpfCnpjRaiz', ''),
+            'cpfCnpjRaiz': product.get('cpfCnpjRaiz', ''),
             'Descrição': product.get('descricao', ''),
             'Denominação': product.get('denominacao', ''),
             # 'Código Interno': product.get('codigosInterno', [''])[0],
@@ -138,6 +138,8 @@ def consultProducts():
             'Situação': product.get('situacao', ''),
             'Versão': product.get('versao', '')
         }
+
+        print('BASE ' + str(base))
 
         attr_dict = {attr.get('atributo'): attr.get('valor') for attr in product.get('atributos', [])}
         for code in all_attr_codes:
@@ -446,8 +448,9 @@ def linksPayload():
 
 @app.route('/post-products', methods=['POST'])
 def postProducts():
-    session_id = request.headers['session-id']
-    payload = request.json['payload']
+    print('POST PRODUCTS aaaaiiii')
+    session_id = request.headers['Session-Id']
+    payload = request.json 
 
     tokens = r.get(session_id)
 
@@ -455,6 +458,7 @@ def postProducts():
         tokens = json.loads(tokens)
     else:
         return jsonify({"error": "Session expired or invalid"}), 401
+    
 
     url_path = '/catp/api/ext/produto'
 
@@ -463,6 +467,8 @@ def postProducts():
         "Authorization": tokens['set-token'],
         "X-CSRF-Token": tokens['x-csrf-token']
     }
+
+
 
     response = post_payload(url_path=url_path, headers=headers, payload=payload, chunk_size=100, prod=PROD)
 

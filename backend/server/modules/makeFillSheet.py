@@ -14,7 +14,46 @@ def makeFillSheet(products, relation_json):
 
     data = []
 
-    products = normalize_column_names(products)
+    possible_names = {
+        'codigo': {
+            'names': ['codigo', 'cod'],
+            'obrigatorio': False
+        },
+        'versao': {
+            'names': ['versao', 'versao (sistema)', 'versao produto', 'versao prod'],
+            'obrigatorio': False
+        },
+        'ncm': {
+            'names': ['ncm'],
+            'obrigatorio': True
+        },
+        'descricao': {
+            'names': ['descricao'],
+            'obrigatorio': True
+        },
+        'denominacao': {
+            'names': ['denominacao'],
+            'obrigatorio': True
+        },
+        'cpfCnpjRaiz': {
+            'names': ['raiz', 'cnpj', 'cpf/cnpj raiz', 'cpf/cnpj', 'cpf', 'cpfcnpjraiz'],
+            'obrigatorio': True
+        },
+        'situacao': {
+            'names': ['situacao'],
+            'obrigatorio': False
+        },
+        'modalidade': {
+            'names': ['modalidade'],
+            'obrigatorio': False
+        },
+        'codigoInterno': {
+            'names': ['codigo interno', 'cod interno', 'codigo produto', 'cod produto'],
+            'obrigatorio': False
+        }
+    }
+
+    products = normalize_column_names(products, possible_names)
 
     for _, row in products.iterrows():
         ncm = row.get('ncm')
@@ -24,7 +63,7 @@ def makeFillSheet(products, relation_json):
         ncm = str(ncm).replace('.', '')
         ncm = ncm.zfill(8)
 
-        raiz = str(row.get('raiz')).replace('.', '')[:8]
+        raiz = str(row.get('cpfCnpjRaiz')).replace('.', '')[:8]
         raiz = raiz.zfill(8)
 
         codigo = row.get('codigo')

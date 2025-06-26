@@ -21,7 +21,7 @@ def makeProductsPayload(products, attributes_json):
         ncm = clean(product.get('ncm'))
         descricao = clean(product.get('descricao'))
         denominacao = clean(product.get('denominacao'))
-        raiz = clean(product.get('raiz'))
+        raiz = clean(product.get('cpfCnpjRaiz'))
         situacao = clean(product.get('situacao', 'ATIVADO'))
         modalidade = clean(product.get('modalidade', 'IMPORTACAO'))
         codigointerno = clean(product.get('codigoInterno'))
@@ -104,12 +104,6 @@ def makeProductsPayload(products, attributes_json):
                 attr_value = ''
             
             if not attr_value:
-                print(attr_code)
-                print(attr_value)
-                print(attr_value == 'nan')
-                print(pd.isna(attr_value))
-                print(obrigatorio)
-                print('\n\n')
                 if obrigatorio:
                     errors.append({
                         'seq': seq, 

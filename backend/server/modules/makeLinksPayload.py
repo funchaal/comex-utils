@@ -1,5 +1,7 @@
 import requests
 
+from modules.utils import normalize_column_names
+
 def consulta_portal_unico_link(lista_raizes, set_token=None, csrf_token=None, prod=False):
     root_url = 'https://portalunico.siscomex.gov.br' if prod else 'https://val.portalunico.siscomex.gov.br'
     url_operadores = f'{root_url}/catp/api/ext/operador-estrangeiro'
@@ -70,49 +72,85 @@ def makeLinksPayload(links, set_token=None, csrf_token=None, prod=False):
     Retorna payload e lista de erros.
     """
 
+    possible_names = {
+        'cpfCnpjRaiz': {
+            'names': ['raiz', 'cnpj', 'cpf/cnpj raiz', 'cpf/cnpj', 'cpf'],
+            'obrigatorio': True
+        },
+        'codigoOperadorEstrangeiro': {
+            'names': ['codigo operador estrangeiro', 'codigo operador estrangeiro (sistema)', 'codigo operador',
+                      'codigo oe', 'codigo op', 'cod operador estrangeiro', 'cod operador',
+                      'cod oe', 'cod op'],
+            'obrigatorio': True
+        },
+        'codigoProduto': {
+            'names': ['codigo produto', 'codigo produto (sistema)',
+                      'codigo prod', 'cod produto', 'cod prod'],
+            'obrigatorio': True
+        },
+        'cpfCnpjFabricante': {
+            'names': ['fabricante', 'cpf/cnpj fabricante',
+                      'cnpj fabricante', 'cpf fabricante'],
+            'obrigatorio': False
+        },
+        'vincular': {
+            'names': ['vincular'],
+            'obrigatorio': False
+        },
+        'conhecido': {
+            'names': ['conhecido'],
+            'obrigatorio': False
+        },
+        'codigoPais': {
+            'names': ['codigo pais', 'codigo do pais', 'cod do pais'],
+            'obrigatorio': False
+        },
+    }
+
+    # Normaliza nomes de colunas com base nos nomes possíveis
+    df = normalize_column_names(links, possible_names)
+
     payload = []
     errors = []
 
-    for i, item in enumerate(links, start=1):
-        raiz = str(item.get('cpfCnpjRaiz', '')).strip()
-        codigo_op_ext = str(item.get('codigoOperadorEstrangeiro', '')).strip()
-        codigo_produto = item.get('codigoProduto')
-        codigo_pais = str(item.get('codigoPais', '')).strip()
-        conhecido = str(item.get('conhecido', '')).strip().lower()
-        vincular = str(item.get('vincular', '')).strip().lower()
-        cpf_fabricante = str(item.get('cpfCnpjFabricante', '')).strip()
+    def to_bool(val):
+        val = str(val).lower().replace('ã', 'a')
+        if val == '' or val == 'sim':
+            return True
+        elif val == 'nao':
+            return False
+        return True  # default
 
-        if not raiz:
-            errors.append({"seq": i, "atributo": "cpfCnpjRaiz", "erro": "Obrigatório"})
-        if not codigo_op_ext:
-            errors.append({"seq": i, "atributo": "codigoOperadorEstrangeiro", "erro": "Obrigatório"})
-        if codigo_produto is None or codigo_produto == '':
-            errors.append({"seq": i, "atributo": "codigoProduto", "erro": "Obrigatório"})
+    for i, row in df.iterrows():
+        row_errors = []
+        item = {'seq': i}
 
-        def to_bool(val):
-            val = str(val).lower().replace('ã', 'a')
-            if val == '' or val == 'sim':
-                return True
-            elif val == 'nao':
-                return False
+        for chave, config in possible_names.items():
+            valor = row.get(chave, '')
+
+            # Pré-processamentos específicos
+            if chave == 'cpfCnpjRaiz':
+                valor = str(valor).replace('.', '').strip()[:8]
+            elif chave == 'codigoPais':
+                valor = str(valor).strip().upper()
+            elif chave in ['conhecido', 'vincular']:
+                valor = to_bool(valor)
             else:
-                return True
+                valor = str(valor).strip()
 
-        conhecido_bool = to_bool(conhecido)
-        vincular_bool = to_bool(vincular)
+            if config['obrigatorio'] and (valor is None or valor == ''):
+                row_errors.append({
+                    "seq": i,
+                    "atributo": chave ,
+                    "erro": "Obrigatório"
+                })
+            else:
+                payload_key = chave
+                item[payload_key] = valor
 
-        obj = {
-            "seq": i,
-            "cpfCnpjRaiz": raiz,
-            "codigoOperadorEstrangeiro": codigo_op_ext,
-            "cpfCnpjFabricante": cpf_fabricante,
-            "conhecido": conhecido_bool,
-            "codigoProduto": codigo_produto,
-            "vincular": vincular_bool,
-            "codigoPais": codigo_pais or ""
-        }
-
-        payload.append(obj)
+        if row_errors:
+            errors.extend(row_errors)
+        payload.append(item)
 
     # Se houver itens com codigoPais vazio, consulta Portal Único para preencher
     raizes_sem_codigo_pais = list(set(item['cpfCnpjRaiz'] for item in payload if not item['codigoPais']))

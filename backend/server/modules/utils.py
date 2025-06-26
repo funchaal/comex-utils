@@ -46,53 +46,13 @@ def levenshtein(s1, s2):
 
     return dp[len_s1][len_s2]
 
-def normalize_column_names(df):
-    # Dicionário de nomes possíveis
-    possible_names = {
-        'ncm': ['ncm'],
-        'descricao': ['descricao'],
-        'denominacao': ['denominacao'],
-        'raiz': ['raiz', 'cnpj', 'cpf/cnpj raiz', 'cpf/cnpj', 'cpf'],
-        'situacao': ['situacao'],
-        'modalidade': ['modalidade'],
-        'codigoInterno': [
-            'codigo interno', 'cod interno',
-            'codigo produto', 'cod produto'
-        ], 
-        'codigoOperadorEstrangeiro': [
-            'codigo operador estrangeiro', 'codigo operador estrangeiro (sistema)', 'codigo operador',
-            'codigo oe', 'codigo op', 'cod operador estrangeiro', 'cod operador',
-            'cod oe', 'cod op'
-        ], 
-        'codigoProduto': [
-            'codigo produto', 'codigo produto (sistema)',
-            'codigo prod', 'cod produto', 'cod prod'
-        ], 
-        'cpfCnpjFabricante': [
-            'fabricante', 'cpf/cnpj fabricante',
-            'cnpj fabricante', 'cpf fabricante'
-        ], 
-        'logradouro': [
-            'logradouro', 'endereco'
-        ],
-        'vincular': [
-            'vincular'
-        ],
-        'conhecido': [
-            'conhecido'
-        ],
-        'nomeCidade': [
-            'cidade', 'nome cidade', 'nome da cidade', 'municipio'
-        ],
-        'codigoPais': [
-            'codigo pais', 'codigo do pais', 'cod do pais'
-        ], 
-        'pais': [
-            'pais', 'nome pais', 'nome do pais', 'pais de origem', 'pais origem'
-        ]
-    }
+import re
+import unicodedata
 
-    # Função auxiliar para remover acentos e substituir ç
+def normalize_column_names(df, possible_names):
+    pn = possible_names.copy()
+
+    # Função auxiliar para remover acentos e normalizar texto
     def normalize_text(text):
         text = text.lower()
         text = text.replace('ç', 'c')
@@ -101,31 +61,31 @@ def normalize_column_names(df):
         text = ''.join([c for c in text if not unicodedata.combining(c)])
         return text.strip()
 
-    # Normaliza os nomes atuais das colunas
+    # Normaliza os nomes atuais das colunas do DataFrame
     normalized_columns = {col: normalize_text(col) for col in df.columns}
+    print('normalized_columns', normalized_columns)
 
     # Novo dicionário para renomear colunas
     new_column_names = {}
 
     for original_col, normalized_col in normalized_columns.items():
         matched = False
-        for final_name, aliases in possible_names.items():
+        for final_name, config in pn.items():
+            aliases = config['names']
             for alias in aliases:
-                if alias in normalized_col:
+                if alias == normalized_col:
                     new_column_names[original_col] = final_name
                     matched = True
                     break
-            if matched: 
-                del possible_names[final_name]  # Remove o nome final para evitar duplicatas
+            if matched:
+                del pn[final_name]  # Evita duplicatas
                 break
-                    
-        # if not matched:
-        #     new_column_names[original_col] = normalized_col  # mantém o nome normalizado
 
-    # Renomeia as colunas no DataFrame
+    print('new_column_names', new_column_names)
     df = df.rename(columns=new_column_names)
 
     return df
+
 
 def get_relation_json(prod=False):
     file_path = f"attributes_relation_{'prod' if prod else 'val'}.json"
@@ -137,7 +97,7 @@ def get_relation_json(prod=False):
         now = datetime.now()
 
         # Se o dia ou a hora forem diferentes, baixa novamente
-        if mtime.date() == now.date() and mtime.hour == now.hour:
+        if True or mtime.date() == now.date() or mtime.hour == now.hour:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
 
@@ -168,7 +128,50 @@ def get_relation_json(prod=False):
 def excel_to_dict(df):
     results = []
 
-    df = normalize_column_names(df)
+    print('oiiiiiiiii')
+
+    possible_names = {
+        'codigo': {
+            'names': ['codigo', 'cod'],
+            'obrigatorio': False
+        },
+        'versao': {
+            'names': ['versao', 'versao (sistema)', 'versao produto', 'versao prod'],
+            'obrigatorio': False
+        },
+        'ncm': {
+            'names': ['ncm'],
+            'obrigatorio': True
+        },
+        'descricao': {
+            'names': ['descricao'],
+            'obrigatorio': True
+        },
+        'denominacao': {
+            'names': ['denominacao'],
+            'obrigatorio': True
+        },
+        'cpfCnpjRaiz': {
+            'names': ['raiz', 'cnpj', 'cpf/cnpj raiz', 'cpf/cnpj', 'cpf', 'raiz cnpj', 'raiz cpf/cnpj'],
+            'obrigatorio': True
+        },
+        'situacao': {
+            'names': ['situacao'],
+            'obrigatorio': False
+        },
+        'modalidade': {
+            'names': ['modalidade'],
+            'obrigatorio': False
+        },
+        'codigoInterno': {
+            'names': ['codigo interno', 'cod interno', 'codigo produto', 'cod produto'],
+            'obrigatorio': False
+        }
+    }
+
+    df = normalize_column_names(df, possible_names)
+
+    print('normalized df', df.columns)
 
     for _, row in df.iterrows():
         
@@ -184,7 +187,7 @@ def excel_to_dict(df):
         versao = str(row.get('versao', '')).strip()
         denominacao = str(row.get('denominacao', '')).strip()
 
-        raiz = str(row.get('raiz', '')).replace('.', '').strip()[:8]
+        raiz = str(row.get('cpfCnpjRaiz', '')).replace('.', '').strip()[:8]
         raiz = raiz.zfill(8)
 
         situacao = str(row.get('situacao', 'ATIVADO')).strip().upper()
@@ -194,7 +197,7 @@ def excel_to_dict(df):
         atributos = []
         
         for col in df.columns:
-            if col not in ('codigo', 'versao', 'ncm', 'descricao', 'denominacao', 'codigoInterno', 'raiz', 'situacao', 'modalidade'):
+            if col not in ('codigo', 'versao', 'ncm', 'descricao', 'denominacao', 'codigoInterno', 'cpfCnpjRaiz', 'situacao', 'modalidade'):
                 value = row[col]
 
                 if '\n\n' in col:
@@ -218,7 +221,7 @@ def excel_to_dict(df):
             'codigo': codigo, 
             'versao': versao, 
             'ncm': ncm, 
-            'raiz': raiz, 
+            'cpfCnpjRaiz': raiz, 
             'descricao': descricao, 
             'denominacao': denominacao, 
             'codigoInterno': codigointerno, 
@@ -226,6 +229,8 @@ def excel_to_dict(df):
             'situacao': situacao, 
             'atributos': atributos
         })
+
+        print(results)
     
     return results
 
