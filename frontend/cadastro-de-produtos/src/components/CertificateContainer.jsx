@@ -5,6 +5,7 @@ import { AuthContext } from '../AuthContext'
 
 import Input from './Input'
 
+import Modal from './Modal'
 
 // utils/config.js
 export const HOST = import.meta.env.MODE === 'production'
@@ -65,20 +66,9 @@ function CertificateContainer({ show, onClose }) {
   if (!show) return null
 
   return (
-    <div className="certificate-overlay" onClick={onClose}>
-    <div className="certificate-container">
-      <div className="certificate-modal" onClick={(e) => e.stopPropagation()}>
-        <div>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p className='certificate-modal-title'>Adicione seu certificado .pfx</p>
-        <div className="modal-close-desktop">
-          <button onClick={onClose} className='x'>
-          ✕
-        </button>
-        </div>
-        </div>
-        <br />
-        <Uploader
+    <Modal show={show} onClose={onClose} title="Adicionar Certificado .pfx" x_mobile={false}>
+      <br />
+      <Uploader
           draggable
           autoUpload={false}
           ref={certificateInputRef}
@@ -98,6 +88,7 @@ function CertificateContainer({ show, onClose }) {
         <div>
 
             <br />
+            <div>
         <Input
           label="Senha do certificado"
           type="password"
@@ -109,7 +100,7 @@ function CertificateContainer({ show, onClose }) {
             <p className="error">{certificateAuthenticationErrorMessage}</p>
         )}
         </div>
-        </div>
+        {/* </div> */}
 
         <Button
           color={conectionValidated ? 'green' : 'blue'}
@@ -123,8 +114,7 @@ function CertificateContainer({ show, onClose }) {
           {conectionValidated ? 'Autenticado!' : 'Autenticar'}
         </Button>
             </div>
-      </div>
-    </div>
+    </Modal>
   )
 }
 

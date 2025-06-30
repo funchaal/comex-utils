@@ -8,7 +8,7 @@ export const HOST = import.meta.env.MODE === 'production'
   : 'http://127.0.0.1:5000';
 
 
-import JsonCardViwer from '../components/JsonCardViwer';
+// import JsonCardViwer from '../components/JsonCardViwer';
 
 function GerarPlanilha() {
     const [loading, setLoading] = useState(false);
@@ -134,7 +134,7 @@ function GerarPlanilha() {
             
             <div className={`response-container ${responseClass}`}>
                 <p>{ responseTitle }</p>
-                <JsonCardViwer data={results.content} />
+                {/* <JsonCardViwer data={results.content} /> */}
             </div>
         </div>
     );

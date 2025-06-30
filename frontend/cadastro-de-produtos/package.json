@@ -12,6 +12,8 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-json-pretty": "^2.2.0",
+    "react-json-view": "^1.21.3",
     "react-router-dom": "^7.3.0",
     "rsuite": "^5.78.1"
   },

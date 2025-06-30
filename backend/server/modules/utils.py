@@ -10,12 +10,26 @@ import re
 
 import unicodedata
 
+import math
+
 import tkinter as tk
 from tkinter import filedialog
 
 from datetime import datetime
 
 from typing import List, Dict, Any
+
+def safe_json(obj):
+    def fix_nan(o):
+        if isinstance(o, float) and (math.isnan(o) or math.isinf(o)):
+            return None
+        elif isinstance(o, dict):
+            return {k: fix_nan(v) for k, v in o.items()}
+        elif isinstance(o, list):
+            return [fix_nan(i) for i in o]
+        return o
+
+    return fix_nan(obj)
 
 def levenshtein(s1, s2):
     len_s1 = len(s1)
@@ -63,7 +77,6 @@ def normalize_column_names(df, possible_names):
 
     # Normaliza os nomes atuais das colunas do DataFrame
     normalized_columns = {col: normalize_text(col) for col in df.columns}
-    print('normalized_columns', normalized_columns)
 
     # Novo dicionário para renomear colunas
     new_column_names = {}
@@ -81,7 +94,6 @@ def normalize_column_names(df, possible_names):
                 del pn[final_name]  # Evita duplicatas
                 break
 
-    print('new_column_names', new_column_names)
     df = df.rename(columns=new_column_names)
 
     return df
@@ -128,7 +140,6 @@ def get_relation_json(prod=False):
 def excel_to_dict(df):
     results = []
 
-    print('oiiiiiiiii')
 
     possible_names = {
         'codigo': {
@@ -170,8 +181,6 @@ def excel_to_dict(df):
     }
 
     df = normalize_column_names(df, possible_names)
-
-    print('normalized df', df.columns)
 
     for _, row in df.iterrows():
         
@@ -229,8 +238,6 @@ def excel_to_dict(df):
             'situacao': situacao, 
             'atributos': atributos
         })
-
-        print(results)
     
     return results
 
@@ -257,7 +264,6 @@ def post_payload(
             response.raise_for_status()  # primeiro verificar status!
 
             response_data = response.json()
-            print(response_data)
 
             if isinstance(response_data, list):
                 all_responses.extend(response_data)

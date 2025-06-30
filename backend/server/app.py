@@ -1,6 +1,6 @@
 from modules.autorization import autorizate
 
-from modules.utils import get_relation_json, excel_to_dict, post_payload
+from modules.utils import get_relation_json, excel_to_dict, post_payload, safe_json
 
 from modules.makeFillSheet import makeFillSheet
 
@@ -402,11 +402,10 @@ def productsPayload():
 
     payload, errors = makeProductsPayload(products, relation_json)
 
-    print(errors)
     if len(errors) > 0:
-        return jsonify(errors), 422
+        return jsonify(safe_json(errors)), 422
     else:
-        return jsonify(payload), 200
+        return jsonify(safe_json(payload)), 200
     
 @app.route('/operators-payload', methods=['POST'])
 def operatorsPayload():
@@ -423,9 +422,9 @@ def operatorsPayload():
     payload, errors = makeOperatorsPayload(df)
 
     if len(errors) > 0:
-        return jsonify(errors), 422
+        return jsonify(safe_json(errors)), 422
     else:
-        return jsonify(payload), 200
+        return jsonify(safe_json(payload)), 200
     
 @app.route('/links-payload', methods=['POST'])
 def linksPayload():
@@ -442,13 +441,12 @@ def linksPayload():
     payload, errors = makeLinksPayload(df)
 
     if len(errors) > 0:
-        return jsonify(errors), 422
+        return jsonify(safe_json(errors)), 422
     else:
-        return jsonify(payload), 200
+        return jsonify(safe_json(payload)), 200
 
 @app.route('/post-products', methods=['POST'])
 def postProducts():
-    print('POST PRODUCTS aaaaiiii')
     session_id = request.headers['Session-Id']
     payload = request.json 
 
